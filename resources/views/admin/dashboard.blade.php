@@ -10,7 +10,7 @@
             : '16,108 284,108';
     @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Administração</p>
             <h1 class="page-title">Panorama da operação</h1>
@@ -20,10 +20,10 @@
     </section>
 
     <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores da plataforma">
-        <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" tone="cyan" />
-        <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" tone="green" />
-        <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" tone="navy" />
-        <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" tone="amber" />
+        <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" tone="cyan" icon="orders" />
+        <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" tone="green" icon="revenue" />
+        <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" tone="navy" icon="products" />
+        <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" tone="amber" icon="resellers" />
     </section>
 
     <section class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">

@@ -1,76 +1,116 @@
-<x-layouts.app title="Cotação | Eficaz B2B" active-nav="orders">
+<x-layouts.app title="Orçamento | Eficaz B2B" active-nav="quotes">
     @php
-        $quoteItems = data_get($quote ?? null, 'items', []);
-        $quoteCreatedAt = data_get($quote ?? null, 'created_at');
-        $quoteSubtotal = (float) data_get($quote ?? null, 'subtotal', 0);
-        $quoteDiscount = (float) data_get($quote ?? null, 'discount', 0);
-        $quoteTotal = (float) data_get($quote ?? null, 'total', 0);
-        $convertedOrder = data_get($quote ?? null, 'order');
+        $quoteItems = data_get($quote, 'items', []);
+        $quoteId = (int) data_get($quote, 'id', 0);
+        $quoteCreatedAt = data_get($quote, 'created_at');
+        $quoteSubtotal = (float) data_get($quote, 'subtotal', 0);
+        $quoteDiscount = (float) data_get($quote, 'discount', 0);
+        $quoteTotal = (float) data_get($quote, 'total', 0);
+        $convertedOrder = data_get($quote, 'order');
+        $quoteNumber = 'ORC-' . ($quoteCreatedAt ? \Illuminate\Support\Carbon::parse($quoteCreatedAt)->format('Y') : '—')
+            . '-' . str_pad((string) $quoteId, 4, '0', STR_PAD_LEFT);
     @endphp
 
-    <section class="page-heading">
-        <div>
-            <p class="eyebrow">Cotação comercial</p>
-            <h1 class="page-title">Cotação #{{ data_get($quote ?? null, 'id', '—') }}</h1>
-            <p class="page-subtitle">Gerada em {{ $quoteCreatedAt ? \Illuminate\Support\Carbon::parse($quoteCreatedAt)->format('d/m/Y \à\s H:i') : 'data indisponível' }}. Revise os itens e confirme para criar seu pedido.</p>
-        </div>
-        <a href="{{ route('reseller.products.index') }}" class="btn btn-secondary">Voltar ao catálogo</a>
-    </section>
+    <div class="quote-mobile-heading lg:hidden">
+        <h1>Orçamento</h1>
+        <p>Revise os itens e converta em pedido</p>
+    </div>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
-        <section class="panel">
-            <div class="panel-heading">
-                <div>
-                    <h2 class="panel-title">Itens cotados</h2>
-                    <p class="panel-subtitle">Os valores abaixo foram registrados no momento da geração desta cotação.</p>
+    <div class="quote-layout">
+        <div class="quote-main-column">
+            <section class="quote-meta-panel" aria-label="Dados do orçamento">
+                <div class="quote-meta-item">
+                    <span>Número</span>
+                    <strong class="quote-number">{{ $quoteNumber }}</strong>
                 </div>
-            </div>
-            @if (count($quoteItems))
-                <div class="data-table-wrap">
-                    <table class="data-table">
-                        <thead><tr><th>Produto</th><th>Valor unitário</th><th>Quantidade</th><th class="text-right">Total</th></tr></thead>
-                        <tbody>
-                            @foreach ($quoteItems as $item)
+                <div class="quote-meta-item">
+                    <span>Data</span>
+                    <strong>{{ $quoteCreatedAt ? \Illuminate\Support\Carbon::parse($quoteCreatedAt)->format('d/m/Y') : '—' }}</strong>
+                </div>
+                <div class="quote-meta-item">
+                    <span>Status</span>
+                    <span @class(['quote-state', 'quote-state--converted' => $convertedOrder, 'quote-state--open' => ! $convertedOrder])>
+                        <span aria-hidden="true"></span>{{ $convertedOrder ? 'Convertido' : 'Em aberto' }}
+                    </span>
+                </div>
+                <div class="quote-meta-item">
+                    <span>Itens</span>
+                    <strong>{{ count($quoteItems) }}</strong>
+                </div>
+            </section>
+
+            <section class="quote-items-panel" aria-labelledby="quote-items-title">
+                <header class="quote-items-heading">
+                    <h2 id="quote-items-title">Itens do orçamento</h2>
+                </header>
+
+                @if (count($quoteItems))
+                    <div class="quote-items-table-wrap">
+                        <table class="quote-items-table">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <p class="font-bold text-navy-950">{{ data_get($item, 'name', 'Produto') }}</p>
-                                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">SKU {{ data_get($item, 'sku', '—') }}</p>
-                                        @if (data_get($item, 'description'))
-                                            <p class="mt-1 max-w-md text-xs leading-5 text-slate-500">{{ data_get($item, 'description') }}</p>
-                                        @endif
-                                    </td>
-                                    <td>R$ {{ number_format((float) data_get($item, 'unit_price', 0), 2, ',', '.') }}</td>
-                                    <td>{{ data_get($item, 'quantity', 0) }}</td>
-                                    <td class="text-right font-bold text-navy-950">R$ {{ number_format((float) data_get($item, 'line_total', 0), 2, ',', '.') }}</td>
+                                    <th scope="col">SKU</th>
+                                    <th scope="col">Produto</th>
+                                    <th scope="col">Qtd.</th>
+                                    <th scope="col">Preço unit.</th>
+                                    <th scope="col">Subtotal</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @else
-                <x-empty-state title="Esta cotação não tem itens" description="Volte ao catálogo e crie uma nova solicitação de cotação." action-label="Consultar catálogo" :action-route="route('reseller.products.index')" />
-            @endif
-        </section>
+                            </thead>
+                            <tbody>
+                                @foreach ($quoteItems as $item)
+                                    <tr>
+                                        <td class="quote-item-sku">{{ data_get($item, 'sku', '—') }}</td>
+                                        <td>
+                                            <strong class="quote-item-name">{{ data_get($item, 'name', 'Produto') }}</strong>
+                                            @if (data_get($item, 'description'))
+                                                <span class="quote-item-description">{{ data_get($item, 'description') }}</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ data_get($item, 'quantity', 0) }}</td>
+                                        <td class="quote-item-price">R$ {{ number_format((float) data_get($item, 'unit_price', 0), 2, ',', '.') }}</td>
+                                        <td class="quote-item-total">R$ {{ number_format((float) data_get($item, 'line_total', 0), 2, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="quote-empty-state">
+                        <p>Este orçamento não possui itens.</p>
+                        <a href="{{ route('reseller.products.index') }}">Voltar ao catálogo</a>
+                    </div>
+                @endif
+            </section>
+        </div>
 
-        <aside class="panel h-fit p-5">
-            <h2 class="panel-title">Resumo comercial</h2>
-            <dl class="mt-5 space-y-3 text-sm">
-                <div class="flex justify-between gap-4 text-slate-600"><dt>Subtotal</dt><dd>R$ {{ number_format($quoteSubtotal, 2, ',', '.') }}</dd></div>
-                <div class="flex justify-between gap-4 text-emerald-700"><dt>Desconto comercial</dt><dd>- R$ {{ number_format($quoteDiscount, 2, ',', '.') }}</dd></div>
-                <div class="border-t border-slate-100 pt-3"><div class="flex justify-between gap-4 text-base font-bold text-navy-950"><dt>Total</dt><dd>R$ {{ number_format($quoteTotal, 2, ',', '.') }}</dd></div></div>
-            </dl>
-            <p class="mt-5 rounded-xl bg-cyan-50 p-3 text-xs leading-5 text-navy-800">Ao confirmar, esta cotação será convertida em um pedido para acompanhamento da operação.</p>
-            @if ($convertedOrder)
-                <div class="mt-5 rounded-xl bg-emerald-50 p-3 text-sm leading-5 text-emerald-800">
-                    Esta cotação já foi convertida em pedido.
+        <aside class="quote-summary-panel" aria-labelledby="quote-summary-title">
+            <h2 id="quote-summary-title">Resumo do Orçamento</h2>
+            <dl class="quote-summary-lines">
+                <div>
+                    <dt>Subtotal</dt>
+                    <dd>R$ {{ number_format($quoteSubtotal, 2, ',', '.') }}</dd>
                 </div>
-                <a href="{{ route('reseller.orders.show', $convertedOrder) }}" class="btn btn-secondary mt-4 w-full">Ver pedido #{{ data_get($convertedOrder, 'id') }}</a>
+                <div class="quote-savings">
+                    <dt>Economia</dt>
+                    <dd>- R$ {{ number_format($quoteDiscount, 2, ',', '.') }}</dd>
+                </div>
+                <div class="quote-grand-total">
+                    <dt>Total</dt>
+                    <dd>R$ {{ number_format($quoteTotal, 2, ',', '.') }}</dd>
+                </div>
+            </dl>
+
+            @if ($convertedOrder)
+                <p class="quote-converted-note">Este orçamento já foi convertido em pedido.</p>
+                <a href="{{ route('reseller.orders.show', $convertedOrder) }}" class="quote-primary-action">Ver pedido #{{ data_get($convertedOrder, 'id') }}</a>
             @elseif (count($quoteItems))
-                <form method="POST" action="{{ route('reseller.orders.store', $quote) }}" class="mt-5">
+                <form method="POST" action="{{ route('reseller.orders.store', $quote) }}">
                     @csrf
-                    <button type="submit" class="btn btn-cyan w-full">Confirmar pedido</button>
+                    <button type="submit" class="quote-primary-action">Converter em pedido</button>
                 </form>
             @endif
+
+            <a href="{{ route('reseller.cart.index') }}" class="quote-back-action">Voltar ao Carrinho</a>
         </aside>
     </div>
 </x-layouts.app>

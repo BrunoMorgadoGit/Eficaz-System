@@ -20,13 +20,41 @@ class OrderController extends Controller
     public function index(Request $request): View
     {
         $reseller = $this->currentReseller($request);
-        $orders = Order::query()
-            ->where('reseller_id', $reseller->getKey())
-            ->with('items')
-            ->latest()
-            ->paginate(12);
+        $allowedStatuses = ['TODOS', 'PENDENTE', 'APROVADO', 'CONCLUIDO'];
+        $requestedStatus = strtoupper(trim((string) $request->query('status', 'TODOS')));
+        $activeStatus = in_array($requestedStatus, $allowedStatuses, true) ? $requestedStatus : 'TODOS';
 
-        return view('reseller.orders.index', compact('orders'));
+        $countsByStatus = Order::query()
+            ->where('reseller_id', $reseller->getKey())
+            ->selectRaw('status, COUNT(*) AS aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+
+        $statusCounts = [
+            'TODOS' => (int) $countsByStatus->sum(),
+            'PENDENTE' => (int) $countsByStatus->get(Order::STATUS_PENDENTE, 0),
+            'APROVADO' => (int) $countsByStatus->get(Order::STATUS_APROVADO, 0),
+            'CONCLUIDO' => (int) $countsByStatus->get(Order::STATUS_CONCLUIDO, 0),
+        ];
+
+        $ordersQuery = Order::query()
+            ->where('reseller_id', $reseller->getKey())
+            ->when($activeStatus !== 'TODOS', fn ($query) => $query->where('status', $activeStatus));
+
+        $orders = (clone $ordersQuery)
+            ->withCount('items')
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $selectedOrderId = filter_var($request->query('selected'), FILTER_VALIDATE_INT, [
+            'options' => ['min_range' => 1],
+        ]);
+        $selectedOrder = $selectedOrderId
+            ? (clone $ordersQuery)->with('items')->find($selectedOrderId)
+            : null;
+
+        return view('reseller.orders.index', compact('orders', 'activeStatus', 'statusCounts', 'selectedOrder'));
     }
 
     public function show(Request $request, Order $order): View

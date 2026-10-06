@@ -1,7 +1,7 @@
 <x-layouts.app title="Revendedores | Administração" active-nav="resellers">
     @php $resellerList = $resellers ?? []; @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Rede comercial</p>
             <h1 class="page-title">Revendedores</h1>

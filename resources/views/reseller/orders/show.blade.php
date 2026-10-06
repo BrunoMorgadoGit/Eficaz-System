@@ -7,7 +7,7 @@
         $orderTotal = (float) data_get($order ?? null, 'total', 0);
     @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Detalhe do pedido</p>
             <div class="mt-1 flex flex-wrap items-center gap-3">

@@ -4,7 +4,7 @@
         $resellerProfile = data_get($profileUser, 'reseller');
     @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Conta corporativa</p>
             <h1 class="page-title">Meu perfil</h1>
