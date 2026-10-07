@@ -1,7 +1,7 @@
 <x-layouts.app title="Catálogo | Administração" active-nav="products">
     @php $productList = $products ?? []; @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Administração do catálogo</p>
             <h1 class="page-title">Produtos</h1>

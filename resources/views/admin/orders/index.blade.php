@@ -1,7 +1,7 @@
 <x-layouts.app title="Pedidos | Administração" active-nav="orders">
     @php $orderList = $orders ?? []; @endphp
 
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Operação comercial</p>
             <h1 class="page-title">Pedidos</h1>

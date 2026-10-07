@@ -1,5 +1,5 @@
 <x-layouts.app title="Editar produto | Administração" active-nav="products">
-    <section class="page-heading">
+    <section class="page-heading module-page-heading">
         <div>
             <p class="eyebrow">Administração do catálogo</p>
             <h1 class="page-title">Editar produto</h1>
