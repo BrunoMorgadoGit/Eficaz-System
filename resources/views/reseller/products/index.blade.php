@@ -99,6 +99,64 @@
                     </tbody>
                 </table>
             </div>
+            <div class="catalog-mobile-list">
+                @foreach ($catalogProducts as $product)
+                    @php
+                        $stock = (int) data_get($product, 'stock', 0);
+                        $isActive = (bool) data_get($product, 'is_active', false);
+                        $isAvailable = $isActive && $stock > 0;
+                    @endphp
+                    <article class="catalog-mobile-card" aria-labelledby="mobile-product-{{ data_get($product, 'id') }}">
+                        <header class="catalog-mobile-card-header">
+                            <div>
+                                <p class="catalog-mobile-sku">SKU {{ data_get($product, 'sku', '—') }}</p>
+                                <h2 id="mobile-product-{{ data_get($product, 'id') }}">{{ data_get($product, 'name', 'Produto') }}</h2>
+                            </div>
+                            <span @class(['catalog-status', 'catalog-status--active' => $isActive, 'catalog-status--inactive' => ! $isActive])>
+                                <span aria-hidden="true"></span>{{ $isActive ? 'Ativo' : 'Inativo' }}
+                            </span>
+                        </header>
+
+                        @if (data_get($product, 'description'))
+                            <p class="catalog-mobile-description">{{ data_get($product, 'description') }}</p>
+                        @endif
+
+                        <dl class="catalog-mobile-facts">
+                            <div>
+                                <dt>Preço unitário</dt>
+                                <dd>R$ {{ number_format((float) data_get($product, 'price', 0), 2, ',', '.') }}</dd>
+                            </div>
+                            <div>
+                                <dt>Estoque</dt>
+                                <dd @class(['catalog-stock--available' => $stock > 0, 'catalog-stock--empty' => $stock <= 0])>
+                                    {{ $stock > 0 ? number_format($stock, 0, ',', '.') . ' unidades' : 'Esgotado' }}
+                                </dd>
+                            </div>
+                        </dl>
+
+                        <form method="POST" action="{{ route('reseller.cart.items.store') }}" class="catalog-mobile-action">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ data_get($product, 'id') }}">
+                            <label for="quantity-mobile-{{ data_get($product, 'id') }}">Quantidade</label>
+                            <div>
+                                <input
+                                    id="quantity-mobile-{{ data_get($product, 'id') }}"
+                                    type="number"
+                                    name="quantity"
+                                    min="1"
+                                    max="{{ max($stock, 1) }}"
+                                    value="1"
+                                    class="catalog-quantity"
+                                    {{ $isAvailable ? '' : 'disabled' }}
+                                >
+                                <button type="{{ $isAvailable ? 'submit' : 'button' }}" class="catalog-add-button" {{ $isAvailable ? '' : 'disabled' }}>
+                                    {{ $isAvailable ? 'Adicionar ao carrinho' : 'Indisponível' }}
+                                </button>
+                            </div>
+                        </form>
+                    </article>
+                @endforeach
+            </div>
         </section>
     @else
         <section class="catalog-empty-state">

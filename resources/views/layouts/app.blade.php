@@ -79,13 +79,13 @@
 
     <div class="page-shell lg:flex">
         <aside class="app-sidebar" aria-label="Navegação principal">
-            <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup" aria-label="Eficaz B2B, página inicial">
-                <span class="brand-mark" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" class="h-6 w-6 fill-none stroke-current" stroke-width="2.2"><path d="M4 19V9l8-5 8 5v10M8 19v-6h8v6M4 9h16" stroke-linejoin="round"/></svg>
+            <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup brand-lockup--sidebar" aria-label="Eficaz B2B, página inicial">
+                <span class="sidebar-brand-icon" aria-hidden="true">
+                    <img src="{{ asset('image/icon.png') }}" alt="" width="1254" height="1254">
                 </span>
-                <span>
-                    <span class="brand-name block">Eficaz B2B</span>
-                    <span class="brand-caption block">Gestão industrial</span>
+                <span class="sidebar-brand-copy">
+                    <strong>EFICAZ</strong>
+                    <small>PORTAL B2B</small>
                 </span>
             </a>
 
@@ -109,7 +109,7 @@
                 <p class="sidebar-section-label">Revendedor</p>
                 <nav class="space-y-1">
                     <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg> Dashboard
+                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg> Visão geral
                     </a>
                     <a href="{{ route('reseller.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>
                         <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4m8-14v10l-8 4m8-14v10l-8 4m0-10v10" stroke-linejoin="round"/></svg> Produtos
@@ -180,7 +180,7 @@
                 @elseif ($activeNav === 'dashboard' && ! $isAdmin)
                     <div class="desktop-dashboard-header">
                         <div>
-                            <h1>Dashboard</h1>
+                            <h1>Visão geral</h1>
                             <p>Bem-vindo de volta, {{ $displayName }}. Aqui está o resumo da sua conta.</p>
                         </div>
                         <a href="{{ route('reseller.products.index') }}" class="dashboard-search-link">
@@ -213,9 +213,8 @@
                     </div>
                 @endif
                 <div class="flex items-center justify-between gap-4 lg:hidden">
-                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup">
-                        <span class="brand-mark h-8 w-8 rounded-lg" aria-hidden="true"><svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="2.2"><path d="M4 19V9l8-5 8 5v10M8 19v-6h8v6M4 9h16" stroke-linejoin="round"/></svg></span>
-                        <span class="brand-name text-navy-950">Eficaz B2B</span>
+                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup brand-lockup--mobile" aria-label="Eficaz B2B, página inicial">
+                        <img src="{{ asset('image/logo.png') }}" alt="" class="mobile-brand-image" width="2172" height="724">
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
@@ -229,7 +228,7 @@
                         <a href="{{ route('admin.resellers.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])>Revendedores</a>
                         <a href="{{ route('admin.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>Pedidos</a>
                     @else
-                        <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Dashboard</a>
+                        <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>
                         <a href="{{ route('reseller.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>Produtos</a>
                         <a href="{{ route('reseller.cart.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'cart'])>Carrinho @if ($cartProductCount > 0)<span class="sidebar-cart-count">{{ $cartProductCount }}</span>@endif</a>
                         <a href="{{ $quoteNavHref }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])>Orçamento</a>

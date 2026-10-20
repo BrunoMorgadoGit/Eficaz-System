@@ -1,4 +1,4 @@
-<x-layouts.app title="Dashboard | Eficaz B2B" active-nav="dashboard">
+<x-layouts.app title="Visão geral | Eficaz B2B" active-nav="dashboard">
     @php
         $summary = $stats ?? [];
         $recentOrders = $recentOrders ?? collect();
@@ -11,7 +11,7 @@
 
     <div class="reseller-dashboard">
         <header class="dashboard-mobile-heading lg:hidden">
-            <h1>Dashboard</h1>
+            <h1>Visão geral</h1>
             <p>Bem-vindo de volta, {{ data_get($reseller, 'user.name', 'revendedor') }}. Aqui está o resumo da sua conta.</p>
         </header>
 

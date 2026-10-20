@@ -21,9 +21,9 @@
 
     <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores da plataforma">
         <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" tone="cyan" icon="orders" />
-        <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" tone="green" icon="revenue" />
-        <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" tone="navy" icon="products" />
-        <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" tone="amber" icon="resellers" />
+        <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" tone="cyan" icon="revenue" />
+        <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" tone="cyan" icon="products" />
+        <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" tone="cyan" icon="resellers" />
     </section>
 
     <section class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
@@ -38,7 +38,7 @@
             <div class="mt-6 overflow-hidden rounded-xl border border-slate-100 bg-slate-25 p-3 sm:p-5">
                 <svg viewBox="0 0 300 130" class="h-44 w-full" role="img" aria-label="Gráfico de tendência dos pedidos">
                     <path d="M16 20H284M16 64H284M16 108H284" stroke="#dbe7ef" stroke-width="1" stroke-dasharray="3 5"/>
-                    <polyline points="{{ $trendPoints }}" fill="none" stroke="#10c8d4" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="{{ $trendPoints }}" fill="none" stroke="#0755f8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                     @if ($trendValues->count() > 1)
                         @foreach ($trendValues as $value)
                             @php
