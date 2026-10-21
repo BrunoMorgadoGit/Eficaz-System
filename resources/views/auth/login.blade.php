@@ -43,7 +43,10 @@
                     </header>
 
                     @if (session('success'))
-                        <div class="login-notice login-notice--success" role="status">{{ session('success') }}</div>
+                        <div class="login-notice login-notice--success" role="status">
+                            <x-icon name="check" class="h-4 w-4 shrink-0 text-emerald-700" stroke-width="2" />
+                            <span>{{ session('success') }}</span>
+                        </div>
                     @endif
 
                     @if ($errors->any())

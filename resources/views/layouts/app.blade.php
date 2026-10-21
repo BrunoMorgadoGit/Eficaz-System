@@ -181,24 +181,24 @@
                         {{ mb_strtoupper(mb_substr($displayName, 0, 1)) }}
                     </div>
                     <div class="sidebar-user-info">
-                        <p class="sidebar-user-name">{{ $displayName }}</p>
+                        <p class="sidebar-user-name" title="{{ $displayName }}">{{ $displayName }}</p>
                         @if ($currentReseller)
-                            <p class="sidebar-user-sub">{{ $currentReseller->company_name }}</p>
-                            <p class="sidebar-user-role">{{ $currentReseller->commercial_profile }}</p>
+                            <p class="sidebar-user-sub" title="{{ $currentReseller->company_name }}">{{ $currentReseller->company_name }}</p>
+                            <p class="sidebar-user-role font-mono">{{ $currentReseller->commercial_profile }}</p>
                         @else
-                            <p class="sidebar-user-sub">{{ $displayEmail }}</p>
+                            <p class="sidebar-user-sub" title="{{ $displayEmail }}">{{ $displayEmail }}</p>
                             <p class="sidebar-user-role">Administrador</p>
                         @endif
                     </div>
                 </div>
                 <div class="sidebar-user-actions">
-                    <a href="{{ route('profile') }}" class="sidebar-user-link" title="Meu perfil">
+                    <a href="{{ route('profile') }}" class="sidebar-user-link" title="Meu perfil" aria-label="Perfil">
                         <x-icon name="user" stroke-width="1.8" class="h-4 w-4" />
                         <span class="nav-label">Perfil</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
                         @csrf
-                        <button type="submit" class="sidebar-user-link sidebar-logout-btn" title="Sair">
+                        <button type="submit" class="sidebar-user-link sidebar-logout-btn" title="Sair" aria-label="Sair">
                             <x-icon name="logout" stroke-width="1.8" class="h-4 w-4" />
                             <span class="nav-label">Sair</span>
                         </button>
