@@ -31,7 +31,7 @@
                     </p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--amber" aria-hidden="true">
-                    <x-icon name="package" stroke-width="1.8" />
+                    <x-icon name="package" />
                 </span>
             </article>
 
@@ -42,7 +42,7 @@
                     <p class="dashboard-stat-hint">Aguardando conversão em pedido</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--blue" aria-hidden="true">
-                    <x-icon name="file-description" stroke-width="1.8" />
+                    <x-icon name="file-description" />
                 </span>
             </article>
 
@@ -53,7 +53,7 @@
                     <p class="dashboard-stat-hint">unidades no carrinho</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--cyan" aria-hidden="true">
-                    <x-icon name="shopping-cart" stroke-width="1.8" />
+                    <x-icon name="shopping-cart" />
                 </span>
             </article>
 
@@ -66,7 +66,7 @@
                     <p class="dashboard-stat-hint">Valor do seu perfil comercial</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--gold" aria-hidden="true">
-                    <x-icon name="credit-card" stroke-width="1.8" />
+                    <x-icon name="credit-card" />
                 </span>
             </article>
         </section>

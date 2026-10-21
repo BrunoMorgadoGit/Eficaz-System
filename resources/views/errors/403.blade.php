@@ -18,7 +18,7 @@
     <main class="grid min-h-screen place-items-center p-5">
         <section class="w-full max-w-lg rounded-3xl bg-white p-8 text-center shadow-2xl shadow-black/20 sm:p-12">
             <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-red-50 text-red-700" aria-hidden="true">
-                <x-icon name="alert-triangle" class="h-7 w-7 fill-none stroke-current" stroke-width="1.8" />
+                <x-icon name="alert-triangle" class="h-7 w-7" />
             </span>
             <p class="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-red-700">Erro 403</p>
             <h1 class="mt-2 text-2xl font-bold tracking-tight text-navy-950 sm:text-3xl">Você não tem acesso a esta área.</h1>

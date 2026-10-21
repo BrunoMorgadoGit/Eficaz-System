@@ -15,7 +15,7 @@
 
     <form method="GET" action="{{ route('reseller.products.index') }}" class="catalog-toolbar">
         <div class="catalog-search-wrap">
-            <x-icon name="search" class="catalog-search-icon" stroke-width="1.8" />
+            <x-icon name="search" class="catalog-search-icon" />
             <label for="catalog-search" class="sr-only">Buscar produto pelo SKU ou nome</label>
             <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU ou nome...">
             <button type="submit" class="sr-only">Buscar</button>
