@@ -4,6 +4,7 @@
         $recentOrders = $recentOrders ?? [];
         $trendValues = $trendValues ?? data_get($trend ?? [], 'values', []);
         $trendValues = is_iterable($trendValues) ? collect($trendValues)->map(fn ($value) => (float) $value)->values() : collect();
+        $trendLabels = collect(data_get($trend ?? [], 'labels', []))->values();
         $trendMax = max(1, (float) ($trendValues->max() ?? 1));
         $trendPoints = $trendValues->count() > 1
             ? $trendValues->values()->map(fn ($value, $index) => round(16 + ($index * (268 / max(1, $trendValues->count() - 1))), 1) . ',' . round(108 - (($value / $trendMax) * 78), 1))->implode(' ')
@@ -36,21 +37,53 @@
                     </div>
                     <span class="admin-dashboard-chart-badge rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-700">Pedidos</span>
                 </div>
-                <div class="admin-dashboard-chart-frame mt-6 overflow-hidden rounded-xl border border-slate-100 bg-slate-25 p-3 sm:p-5">
-                    <svg viewBox="0 0 300 130" class="h-44 w-full" role="img" aria-label="Gráfico de tendência dos pedidos">
+                <div class="admin-dashboard-chart-frame relative mt-6 rounded-xl border border-slate-100 bg-slate-25 p-3 sm:p-5">
+                    <svg viewBox="0 0 300 132" class="h-44 w-full overflow-visible" role="img" aria-label="Gráfico de tendência dos pedidos">
                         <path d="M16 20H284M16 64H284M16 108H284" stroke="#dbe7ef" stroke-width="1" stroke-dasharray="3 5"/>
                         <polyline points="{{ $trendPoints }}" fill="none" stroke="#0755f8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                         @if ($trendValues->count() > 1)
+                            @php
+                                $columnWidth = round(268 / max(1, $trendValues->count() - 1), 1);
+                            @endphp
                             @foreach ($trendValues as $value)
                                 @php
                                     $pointIndex = $loop->index;
                                     $pointX = round(16 + ($pointIndex * (268 / max(1, $trendValues->count() - 1))), 1);
                                     $pointY = round(108 - (($value / $trendMax) * 78), 1);
+                                    $pointLabel = $trendLabels->get($pointIndex, '');
+                                    $orderCount = (int) $value;
+                                    $orderText = $orderCount === 1 ? '1 pedido feito' : "{$orderCount} pedidos feitos";
                                 @endphp
-                                <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="4" fill="#0a2540" stroke="#fff" stroke-width="2"/>
+                                <g class="chart-point-group cursor-pointer focus:outline-none" tabindex="0" data-label="{{ ucfirst($pointLabel) }}" data-value="{{ $orderText }}" data-count="{{ $orderCount }}">
+                                    <!-- Hover vertical guideline -->
+                                    <line x1="{{ $pointX }}" y1="16" x2="{{ $pointX }}" y2="108" stroke="#0755f8" stroke-width="1.5" stroke-dasharray="2 3" class="chart-guide" />
+                                    <!-- Hit area for easy cursor hovering -->
+                                    <rect x="{{ max(0, $pointX - ($columnWidth / 2)) }}" y="10" width="{{ $columnWidth }}" height="106" fill="transparent" />
+                                    <!-- Glow / Halo on hover -->
+                                    <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="9" fill="#0755f8" class="chart-halo" />
+                                    <!-- Main dot -->
+                                    <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="4" fill="#0a2540" stroke="#fff" stroke-width="2" class="chart-dot" />
+                                    <!-- Month label -->
+                                    @if ($pointLabel)
+                                        <text x="{{ $pointX }}" y="124" fill="#94a3b8" font-size="8" font-family="sans-serif" font-weight="600" text-anchor="middle" class="select-none uppercase tracking-wider">{{ $pointLabel }}</text>
+                                    @endif
+                                    <title>{{ ucfirst($pointLabel) ? ucfirst($pointLabel) . ': ' : '' }}{{ $orderText }}</title>
+                                </g>
                             @endforeach
                         @endif
                     </svg>
+
+                    <!-- Floating Tooltip -->
+                    <div id="chart-tooltip" class="pointer-events-none absolute z-20 hidden -translate-x-1/2 transition-all duration-75 ease-out" style="top: 0; left: 0;">
+                        <div id="chart-tooltip-wrapper" class="flex flex-col items-center">
+                            <div id="chart-tooltip-arrow-top" class="hidden h-1.5 w-2 -mb-px border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-slate-900"></div>
+                            <div class="rounded-lg bg-slate-900 px-3 py-1.5 text-center shadow-lg ring-1 ring-white/10">
+                                <p id="chart-tooltip-label" class="text-[10px] font-semibold uppercase tracking-wider text-slate-300"></p>
+                                <p id="chart-tooltip-value" class="text-xs font-bold text-white"></p>
+                            </div>
+                            <div id="chart-tooltip-arrow-bottom" class="h-1.5 w-2 -mt-px border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-900"></div>
+                        </div>
+                    </div>
                 </div>
                 @if (! $trendValues->count())
                     <p class="admin-dashboard-chart-empty mt-3 text-xs leading-5 text-slate-500">Ainda não há dados suficientes para desenhar uma tendência de pedidos.</p>
@@ -97,4 +130,94 @@
             @endif
         </section>
     </div>
+
+    <script>
+        (function () {
+            const frame = document.querySelector('.admin-dashboard-chart-frame');
+            const tooltip = document.getElementById('chart-tooltip');
+            const tooltipLabel = document.getElementById('chart-tooltip-label');
+            const tooltipValue = document.getElementById('chart-tooltip-value');
+            const arrowTop = document.getElementById('chart-tooltip-arrow-top');
+            const arrowBottom = document.getElementById('chart-tooltip-arrow-bottom');
+
+            if (!frame || !tooltip || !tooltipLabel || !tooltipValue) return;
+
+            const pointGroups = frame.querySelectorAll('.chart-point-group');
+
+            function showTooltip(group) {
+                const label = group.getAttribute('data-label') || '';
+                const value = group.getAttribute('data-value') || '';
+                if (!value) return;
+
+                tooltipLabel.textContent = label;
+                tooltipLabel.style.display = label ? 'block' : 'none';
+                tooltipValue.textContent = value;
+
+                const dot = group.querySelector('.chart-dot');
+                const target = dot || group;
+                const targetRect = target.getBoundingClientRect();
+                const frameRect = frame.getBoundingClientRect();
+
+                let x = targetRect.left + (targetRect.width / 2) - frameRect.left;
+                let y = targetRect.top - frameRect.top - 8;
+                let isBelow = false;
+
+                if (y < 42) {
+                    y = targetRect.bottom - frameRect.top + 8;
+                    isBelow = true;
+                }
+
+                const tooltipWidth = tooltip.offsetWidth || 110;
+                const minX = (tooltipWidth / 2) + 6;
+                const maxX = frameRect.width - (tooltipWidth / 2) - 6;
+                x = Math.max(minX, Math.min(maxX, x));
+
+                tooltip.style.left = `${x}px`;
+                tooltip.style.top = `${y}px`;
+
+                if (isBelow) {
+                    tooltip.classList.remove('-translate-y-full');
+                    if (arrowTop) arrowTop.classList.remove('hidden');
+                    if (arrowBottom) arrowBottom.classList.add('hidden');
+                } else {
+                    tooltip.classList.add('-translate-y-full');
+                    if (arrowTop) arrowTop.classList.add('hidden');
+                    if (arrowBottom) arrowBottom.classList.remove('hidden');
+                }
+
+                tooltip.classList.remove('hidden');
+                group.classList.add('is-active');
+            }
+
+            function hideTooltip(group) {
+                tooltip.classList.add('hidden');
+                if (group && group.classList) {
+                    group.classList.remove('is-active');
+                } else {
+                    pointGroups.forEach(function (g) {
+                        g.classList.remove('is-active');
+                    });
+                }
+            }
+
+            pointGroups.forEach(function (group) {
+                group.addEventListener('mouseenter', function () {
+                    showTooltip(group);
+                });
+                group.addEventListener('focus', function () {
+                    showTooltip(group);
+                });
+                group.addEventListener('mouseleave', function () {
+                    hideTooltip(group);
+                });
+                group.addEventListener('blur', function () {
+                    hideTooltip(group);
+                });
+            });
+
+            frame.addEventListener('mouseleave', function () {
+                hideTooltip();
+            });
+        })();
+    </script>
 </x-layouts.app>

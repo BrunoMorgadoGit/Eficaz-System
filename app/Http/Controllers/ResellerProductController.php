@@ -18,13 +18,18 @@ class ResellerProductController extends Controller
 
         $products = Product::query()
             ->where('is_active', true)
-            ->when($searchedSku, fn ($query) => $query->where('sku', $searchedSku))
+            ->when($searchedSku, function ($query, $searchedSku) {
+                $query->where(function ($subQuery) use ($searchedSku) {
+                    $subQuery->where('sku', 'like', "%{$searchedSku}%")
+                        ->orWhere('name', 'like', "%{$searchedSku}%");
+                });
+            })
             ->orderBy('sku')
             ->paginate(12)
             ->withQueryString();
 
         $searchFeedback = $searchedSku && $products->isEmpty()
-            ? "Nenhum produto disponível foi encontrado para o SKU {$searchedSku}."
+            ? "Nenhum produto disponível foi encontrado para \"{$searchedSku}\"."
             : null;
 
         return view('reseller.products.index', compact('products', 'searchedSku', 'searchFeedback'));

@@ -28,7 +28,7 @@ class StoreProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'sku' => strtoupper(trim((string) $this->input('sku'))),
+            'sku' => strtoupper(preg_replace('/\s+/', '-', trim((string) $this->input('sku')))),
             'name' => trim((string) $this->input('name')),
             'description' => $this->filled('description') ? trim((string) $this->input('description')) : null,
             'price' => $this->filled('price') ? str_replace(',', '.', trim((string) $this->input('price'))) : null,

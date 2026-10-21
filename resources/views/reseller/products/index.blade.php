@@ -10,14 +10,14 @@
 
     <div class="catalog-mobile-heading lg:hidden">
         <h1>Catálogo de Produtos</h1>
-        <p>Busque pelo SKU do produto</p>
+        <p>Busque pelo SKU ou nome do produto</p>
     </div>
 
     <form method="GET" action="{{ route('reseller.products.index') }}" class="catalog-toolbar">
         <div class="catalog-search-wrap">
             <svg viewBox="0 0 24 24" class="catalog-search-icon" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
-            <label for="catalog-search" class="sr-only">Buscar produto pelo SKU</label>
-            <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU...">
+            <label for="catalog-search" class="sr-only">Buscar produto pelo SKU ou nome</label>
+            <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU ou nome...">
             <button type="submit" class="sr-only">Buscar</button>
         </div>
         <p class="catalog-result-count" aria-live="polite">{{ $resultCount }} {{ $resultCount === 1 ? 'produto encontrado' : 'produtos encontrados' }}</p>
