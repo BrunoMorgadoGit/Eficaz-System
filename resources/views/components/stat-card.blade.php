@@ -24,19 +24,19 @@
         <span class="stat-icon {{ $tones[$tone] ?? $tones['cyan'] }}" aria-hidden="true">
             @switch($icon)
                 @case('orders')
-                    <x-icon name="clipboard-list" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8" />
+                    <x-icon name="clipboard-list" class="h-5 w-5" />
                     @break
                 @case('revenue')
-                    <x-icon name="coin" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8" />
+                    <x-icon name="coin" class="h-5 w-5" />
                     @break
                 @case('products')
-                    <x-icon name="package" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8" />
+                    <x-icon name="package" class="h-5 w-5" />
                     @break
                 @case('resellers')
-                    <x-icon name="users" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8" />
+                    <x-icon name="users" class="h-5 w-5" />
                     @break
                 @default
-                    <x-icon name="layout-dashboard" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8" />
+                    <x-icon name="layout-dashboard" class="h-5 w-5" />
             @endswitch
         </span>
     </div>

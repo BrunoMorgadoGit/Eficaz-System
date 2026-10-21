@@ -115,25 +115,25 @@
                     <a href="{{ route('admin.dashboard') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])
                        title="Visão geral">
-                        <x-icon name="layout-dashboard" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="layout-dashboard" class="nav-icon" />
                         <span class="nav-label">Visão geral</span>
                     </a>
                     <a href="{{ route('admin.products.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])
                        title="Catálogo">
-                        <x-icon name="package" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="package" class="nav-icon" />
                         <span class="nav-label">Catálogo</span>
                     </a>
                     <a href="{{ route('admin.resellers.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])
                        title="Revendedores">
-                        <x-icon name="users" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="users" class="nav-icon" />
                         <span class="nav-label">Revendedores</span>
                     </a>
                     <a href="{{ route('admin.orders.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])
                        title="Pedidos">
-                        <x-icon name="clipboard-list" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="clipboard-list" class="nav-icon" />
                         <span class="nav-label">Pedidos</span>
                     </a>
                 </nav>
@@ -143,32 +143,32 @@
                     <a href="{{ route('reseller.dashboard') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])
                        title="Visão geral">
-                        <x-icon name="layout-dashboard" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="layout-dashboard" class="nav-icon" />
                         <span class="nav-label">Visão geral</span>
                     </a>
                     <a href="{{ route('reseller.products.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])
                        title="Produtos">
-                        <x-icon name="package" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="package" class="nav-icon" />
                         <span class="nav-label">Produtos</span>
                     </a>
                     <a href="{{ route('reseller.cart.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'cart'])
                        title="Carrinho">
-                        <x-icon name="shopping-cart" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="shopping-cart" class="nav-icon" />
                         <span class="nav-label">Carrinho</span>
                         @if ($cartProductCount > 0)<span class="sidebar-cart-count">{{ $cartProductCount }}</span>@endif
                     </a>
                     <a href="{{ $quoteNavHref }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])
                        title="Orçamento">
-                        <x-icon name="file-description" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="file-description" class="nav-icon" />
                         <span class="nav-label">Orçamento</span>
                     </a>
                     <a href="{{ route('reseller.orders.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])
                        title="Meus pedidos">
-                        <x-icon name="clipboard-list" class="nav-icon fill-none stroke-current" stroke-width="1.8" />
+                        <x-icon name="clipboard-list" class="nav-icon" />
                         <span class="nav-label">Meus pedidos</span>
                     </a>
                 </nav>
@@ -193,13 +193,13 @@
                 </div>
                 <div class="sidebar-user-actions">
                     <a href="{{ route('profile') }}" class="sidebar-user-link" title="Meu perfil" aria-label="Perfil">
-                        <x-icon name="user" stroke-width="1.8" class="h-4 w-4" />
+                        <x-icon name="user" class="h-4 w-4" />
                         <span class="nav-label">Perfil</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
                         @csrf
                         <button type="submit" class="sidebar-user-link sidebar-logout-btn" title="Sair" aria-label="Sair">
-                            <x-icon name="logout" stroke-width="1.8" class="h-4 w-4" />
+                            <x-icon name="logout" class="h-4 w-4" />
                             <span class="nav-label">Sair</span>
                         </button>
                     </form>
