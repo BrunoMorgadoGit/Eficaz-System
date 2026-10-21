@@ -40,7 +40,7 @@
     <label class="mt-6 flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
         <input type="hidden" name="is_active" value="0">
         <input type="checkbox" name="is_active" value="1" @checked($isProductActive) class="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
-        <span><span class="font-bold text-navy-950">Produto ativo no catálogo</span><span class="mt-0.5 block text-xs text-slate-500">Somente itens ativos poderão ser incluídos pelo revendedor.</span></span>
+        <span><span class="font-medium text-navy-950">Produto ativo no catálogo</span><span class="mt-0.5 block text-xs text-slate-500">Somente itens ativos poderão ser incluídos pelo revendedor.</span></span>
     </label>
     <x-input-error :messages="$errors->get('is_active')" />
 

@@ -35,15 +35,15 @@
                             @foreach ($orderItems as $item)
                                 <tr>
                                     <td>
-                                        <p class="font-bold text-navy-950">{{ data_get($item, 'name', 'Produto') }}</p>
-                                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">SKU {{ data_get($item, 'sku', '—') }}</p>
+                                        <p class="font-medium text-navy-950">{{ data_get($item, 'name', 'Produto') }}</p>
+                                        <p class="font-mono mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">SKU {{ data_get($item, 'sku', '—') }}</p>
                                         @if (data_get($item, 'description'))
                                             <p class="mt-1 max-w-md text-xs leading-5 text-slate-500">{{ data_get($item, 'description') }}</p>
                                         @endif
                                     </td>
-                                    <td>R$ {{ number_format((float) data_get($item, 'unit_price', 0), 2, ',', '.') }}</td>
-                                    <td>{{ data_get($item, 'quantity', 0) }}</td>
-                                    <td class="text-right font-bold text-navy-950">R$ {{ number_format((float) data_get($item, 'line_total', 0), 2, ',', '.') }}</td>
+                                    <td class="font-mono">R$ {{ number_format((float) data_get($item, 'unit_price', 0), 2, ',', '.') }}</td>
+                                    <td class="font-mono">{{ data_get($item, 'quantity', 0) }}</td>
+                                    <td class="font-mono text-right font-medium text-navy-950">R$ {{ number_format((float) data_get($item, 'line_total', 0), 2, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -57,12 +57,12 @@
         <aside class="panel h-fit p-5">
             <h2 class="panel-title">Resumo financeiro</h2>
             <dl class="mt-5 space-y-3 text-sm">
-                <div class="flex justify-between gap-4 text-slate-600"><dt>Subtotal</dt><dd>R$ {{ number_format($orderSubtotal, 2, ',', '.') }}</dd></div>
-                <div class="flex justify-between gap-4 text-emerald-700"><dt>Desconto</dt><dd>- R$ {{ number_format($orderDiscount, 2, ',', '.') }}</dd></div>
-                <div class="border-t border-slate-100 pt-3"><div class="flex justify-between gap-4 text-base font-bold text-navy-950"><dt>Total do pedido</dt><dd>R$ {{ number_format($orderTotal, 2, ',', '.') }}</dd></div></div>
+                <div class="flex justify-between gap-4 text-slate-600"><dt>Subtotal</dt><dd class="font-mono">R$ {{ number_format($orderSubtotal, 2, ',', '.') }}</dd></div>
+                <div class="flex justify-between gap-4 text-emerald-700"><dt>Desconto</dt><dd class="font-mono">- R$ {{ number_format($orderDiscount, 2, ',', '.') }}</dd></div>
+                <div class="border-t border-slate-100 pt-3"><div class="flex justify-between gap-4 text-base font-medium text-navy-950"><dt>Total do pedido</dt><dd class="font-mono">R$ {{ number_format($orderTotal, 2, ',', '.') }}</dd></div></div>
             </dl>
             <div class="mt-5 rounded-xl bg-slate-50 p-3">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Status atual</p>
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Status atual</p>
                 <div class="mt-2"><x-status-badge :status="data_get($order ?? null, 'status', 'PENDENTE')" /></div>
             </div>
         </aside>

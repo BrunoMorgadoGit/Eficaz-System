@@ -16,7 +16,7 @@
     <div class="flash flash-error" role="alert">
         <x-icon name="alert-triangle" class="mt-0.5 h-5 w-5 shrink-0 fill-none stroke-current" stroke-width="2" />
         <div>
-            <p class="font-semibold">Não foi possível concluir a ação.</p>
+            <p class="font-medium">Não foi possível concluir a ação.</p>
             <ul class="mt-1 list-disc space-y-0.5 pl-4 text-sm">
                 @foreach ($errors->all() as $message)
                     <li>{{ $message }}</li>

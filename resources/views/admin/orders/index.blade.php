@@ -18,13 +18,13 @@
                         @foreach ($orderList as $order)
                             @php $createdAt = data_get($order, 'created_at'); @endphp
                             <tr>
-                                <td><span class="font-bold text-navy-950">#{{ data_get($order, 'id', '—') }}</span></td>
+                                <td><span class="font-mono font-medium text-navy-950">#{{ data_get($order, 'id', '—') }}</span></td>
                                 <td>
-                                    <p class="font-semibold text-slate-700">{{ data_get($order, 'reseller.company_name', '—') }}</p>
+                                    <p class="font-medium text-slate-700">{{ data_get($order, 'reseller.company_name', '—') }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ data_get($order, 'reseller.user.email', '') }}</p>
                                 </td>
                                 <td>{{ $createdAt ? \Illuminate\Support\Carbon::parse($createdAt)->format('d/m/Y') : '—' }}</td>
-                                <td class="text-right font-bold text-navy-950">R$ {{ number_format((float) data_get($order, 'total', 0), 2, ',', '.') }}</td>
+                                <td class="font-mono text-right font-medium text-navy-950">R$ {{ number_format((float) data_get($order, 'total', 0), 2, ',', '.') }}</td>
                                 <td>
                                     <form method="POST" action="{{ route('admin.orders.status.update', $order) }}" class="flex min-w-50 items-center gap-2">
                                         @csrf
@@ -35,7 +35,7 @@
                                                 <option value="{{ $value }}" @selected(data_get($order, 'status') === $value)>{{ $label }}</option>
                                             @endforeach
                                         </select>
-                                        <button type="submit" class="text-xs font-bold text-cyan-700 hover:text-cyan-800">Salvar</button>
+                                        <button type="submit" class="text-xs font-medium text-cyan-700 hover:text-cyan-800">Salvar</button>
                                     </form>
                                 </td>
                             </tr>
