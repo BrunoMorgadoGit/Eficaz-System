@@ -19,15 +19,15 @@
                             @php $user = data_get($reseller, 'user'); @endphp
                             <tr>
                                 <td>
-                                    <p class="font-bold text-navy-950">{{ data_get($reseller, 'company_name', 'Empresa não informada') }}</p>
-                                    <p class="mt-1 text-xs text-slate-500">ID #{{ data_get($reseller, 'id', '—') }}</p>
+                                    <p class="font-medium text-navy-950">{{ data_get($reseller, 'company_name', 'Empresa não informada') }}</p>
+                                    <p class="font-mono mt-1 text-xs text-slate-500">ID #{{ data_get($reseller, 'id', '—') }}</p>
                                 </td>
                                 <td>
-                                    <p class="font-semibold text-slate-700">{{ data_get($user, 'name', '—') }}</p>
+                                    <p class="font-medium text-slate-700">{{ data_get($user, 'name', '—') }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ data_get($user, 'email', '—') }}</p>
                                 </td>
-                                <td><span class="rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-800">{{ data_get($reseller, 'commercial_profile', 'STANDARD') }}</span></td>
-                                <td class="font-semibold text-navy-950">R$ {{ number_format((float) data_get($reseller, 'credit_limit', 0), 2, ',', '.') }}</td>
+                                <td><span class="font-mono text-xs font-medium text-slate-600">{{ data_get($reseller, 'commercial_profile', 'STANDARD') }}</span></td>
+                                <td class="font-mono font-medium text-navy-950">R$ {{ number_format((float) data_get($reseller, 'credit_limit', 0), 2, ',', '.') }}</td>
                                 <td><x-status-badge :status="data_get($reseller, 'is_active', false) ? 'active' : 'inactive'" /></td>
                             </tr>
                         @endforeach

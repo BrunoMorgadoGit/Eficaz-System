@@ -252,6 +252,14 @@ co
 
 ---
 
+## Fontes, cores e ícones
+
+As três famílias de fontes ficam em `resources/css/tokens.css` e alimentam as classes `font-sans`, `font-heading` e `font-mono`. Os pesos usam os padrões do Tailwind: `font-normal` (400), `font-medium` (500), `font-semibold` (600) e `font-bold` (700). Os seis arquivos WOFF2 e seus pesos reais são declarados em `resources/css/fonts.css`, com `font-display: swap`; ao trocar uma família, atualize também essas declarações e preserve sua licença.
+
+As cores personalizadas ficam no mesmo `tokens.css`: `brand` para o azul Eficaz, `navy` para superfícies escuras e `ink` para neutros. Use classes como `bg-brand-500` e `text-ink-600`, ou `var(--color-brand-500)` no CSS e SVG. Transparências usam modificadores como `bg-brand-500/15` ou `--alpha(var(--color-brand-500) / 15%)` no CSS. Cores de estado, branco, pesos e sombras reutilizam os padrões do Tailwind.
+
+Os ícones usam diretamente os nomes dos símbolos em `public/icons/tabler/sprite.svg`: `<x-icon name="package" />`. O componente `resources/views/components/icon.blade.php` concentra o caminho do sprite, o tamanho padrão de 24 e a espessura de 1.8. Use `size="20"` ou `size="1em"` para mudar as duas dimensões, `stroke-width="2"` para um traço forte, ou classes locais para tamanhos contextuais. Atributos como `width`, `height`, classes e acessibilidade podem ser substituídos na chamada. Os ícones são decorativos por padrão; para um ícone com significado próprio, forneça `role="img"`, `aria-hidden="false"` e `aria-label`. Ao adicionar um ícone, inclua seu símbolo no sprite e use o mesmo nome na tela.
+
 ## 🧪 Verificação e Testes
 
 Para rodar a suíte de testes automatizados:

@@ -15,7 +15,7 @@
 
     <form method="GET" action="{{ route('reseller.products.index') }}" class="catalog-toolbar">
         <div class="catalog-search-wrap">
-            <svg viewBox="0 0 24 24" class="catalog-search-icon" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
+            <x-icon name="search" class="catalog-search-icon" />
             <label for="catalog-search" class="sr-only">Buscar produto pelo SKU</label>
             <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU...">
             <button type="submit" class="sr-only">Buscar</button>
@@ -66,9 +66,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span @class(['catalog-status', 'catalog-status--active' => $isActive, 'catalog-status--inactive' => ! $isActive])>
-                                        <span aria-hidden="true"></span>{{ $isActive ? 'Ativo' : 'Inativo' }}
-                                    </span>
+                                    <x-status-badge :status="$isActive ? 'active' : 'inactive'" />
                                 </td>
                                 <td>
                                     <form id="add-to-cart-{{ data_get($product, 'id') }}" method="POST" action="{{ route('reseller.cart.items.store') }}" class="catalog-add-form">
@@ -89,7 +87,7 @@
                                 </td>
                                 <td>
                                     @if ($isAvailable)
-                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button">+ Carrinho</button>
+                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button"><x-icon name="plus" size="1em" /> Carrinho</button>
                                     @else
                                         <button type="button" class="catalog-add-button" disabled>Indisponível</button>
                                     @endif
@@ -112,9 +110,7 @@
                                 <p class="catalog-mobile-sku">SKU {{ data_get($product, 'sku', '—') }}</p>
                                 <h2 id="mobile-product-{{ data_get($product, 'id') }}">{{ data_get($product, 'name', 'Produto') }}</h2>
                             </div>
-                            <span @class(['catalog-status', 'catalog-status--active' => $isActive, 'catalog-status--inactive' => ! $isActive])>
-                                <span aria-hidden="true"></span>{{ $isActive ? 'Ativo' : 'Inativo' }}
-                            </span>
+                            <x-status-badge :status="$isActive ? 'active' : 'inactive'" />
                         </header>
 
                         @if (data_get($product, 'description'))

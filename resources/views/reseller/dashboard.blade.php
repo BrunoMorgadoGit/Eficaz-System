@@ -31,7 +31,7 @@
                     </p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--amber" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Z" stroke-linejoin="round"/><path d="m3 7 9 4 9-4M12 11v10M7.5 5 16 9" stroke-linejoin="round"/></svg>
+                    <x-icon name="package" />
                 </span>
             </article>
 
@@ -42,7 +42,7 @@
                     <p class="dashboard-stat-hint">Aguardando conversão em pedido</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--blue" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z" stroke-linejoin="round"/><path d="M15 3v5h5M9 12h7m-7 4h7" stroke-linecap="round"/></svg>
+                    <x-icon name="file-description" />
                 </span>
             </article>
 
@@ -53,7 +53,7 @@
                     <p class="dashboard-stat-hint">unidades no carrinho</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--cyan" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+                    <x-icon name="shopping-cart" />
                 </span>
             </article>
 
@@ -66,7 +66,7 @@
                     <p class="dashboard-stat-hint">Valor do seu perfil comercial</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--gold" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18m-13 6h4" stroke-linecap="round"/></svg>
+                    <x-icon name="credit-card" />
                 </span>
             </article>
         </section>
@@ -89,7 +89,7 @@
             <article class="dashboard-list-panel">
                 <header class="dashboard-list-heading">
                     <h2>Pedidos recentes</h2>
-                    <a href="{{ route('reseller.orders.index') }}">Ver todos <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('reseller.orders.index') }}">Ver todos <span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </header>
 
                 @forelse ($recentOrders as $order)
@@ -112,7 +112,7 @@
             <article class="dashboard-list-panel">
                 <header class="dashboard-list-heading">
                     <h2>Orçamentos</h2>
-                    <a href="{{ route('reseller.cart.index') }}">Novo orçamento <span aria-hidden="true">→</span></a>
+                    <a href="{{ route('reseller.cart.index') }}">Novo orçamento <span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </header>
 
                 @forelse ($recentQuotes as $quote)
