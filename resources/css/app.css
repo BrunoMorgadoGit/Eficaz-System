@@ -454,7 +454,17 @@
     .catalog-price { color: #10243b !important; font-family: var(--font-mono); font-size: 10px !important; font-weight: 500; white-space: nowrap; }
     .catalog-stock { font-family: var(--font-mono); font-size: 10px; font-weight: 500; white-space: nowrap; }
     .catalog-stock--available { color: #334155; }
-    .catalog-stock--empty { color: #92400e; }
+    .catalog-stock--empty { color: #dc2626; }
+    .catalog-stock--empty::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        vertical-align: middle;
+    }
 
     .catalog-add-form { margin: 0; }
     .catalog-quantity { width: 56px; height: 25px; border: 1px solid #d9e2ec; border-radius: 3px; padding: 0 5px; background: white; color: #10243b; font-family: var(--font-mono); font-size: 10px; text-align: center; }
@@ -1132,7 +1142,7 @@
         .catalog-mobile-facts dt { color: #68768a; font-size: 11px; }
         .catalog-mobile-facts dd { margin: 5px 0 0; color: var(--ui-ink); font-size: 14px; font-weight: 500; }
         .catalog-mobile-facts dd.catalog-stock--available { color: #334155; }
-        .catalog-mobile-facts dd.catalog-stock--empty { color: #92400e; }
+        .catalog-mobile-facts dd.catalog-stock--empty { color: #dc2626; }
         .catalog-mobile-action { margin-top: 17px; border-top: 1px solid var(--ui-line); padding-top: 15px; }
         .catalog-mobile-action label { display: block; margin-bottom: 7px; color: #45566f; font-size: 12px; font-weight: 500; }
         .catalog-mobile-action > div { display: flex; gap: 10px; }
