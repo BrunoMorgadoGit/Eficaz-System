@@ -193,13 +193,13 @@
                 </div>
                 <div class="sidebar-user-actions">
                     <a href="{{ route('profile') }}" class="sidebar-user-link" title="Meu perfil" aria-label="Perfil">
-                        <x-icon name="user" class="h-4 w-4" />
+                        <x-icon name="user" class="nav-icon" />
                         <span class="nav-label">Perfil</span>
                     </a>
                     <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
                         @csrf
                         <button type="submit" class="sidebar-user-link sidebar-logout-btn" title="Sair" aria-label="Sair">
-                            <x-icon name="logout" class="h-4 w-4" />
+                            <x-icon name="logout" class="nav-icon" />
                             <span class="nav-label">Sair</span>
                         </button>
                     </form>
@@ -271,7 +271,7 @@
                             <h1>Carrinho</h1>
                             <p>{{ $cartProductCount }} {{ $cartProductCount === 1 ? 'produto selecionado' : 'produtos selecionados' }}</p>
                         </div>
-                        <a href="{{ route('reseller.products.index') }}"><x-icon name="plus" width="1em" height="1em" class="inline-block align-middle" /> Adicionar produtos</a>
+                        <a href="{{ route('reseller.products.index') }}"><x-icon name="plus" size="1em" /> Adicionar produtos</a>
                     </div>
                 @endif
 

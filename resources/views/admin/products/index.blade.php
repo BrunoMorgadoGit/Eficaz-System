@@ -7,7 +7,7 @@
             <h1 class="page-title">Produtos</h1>
             <p class="page-subtitle">Cadastre e mantenha os itens disponíveis para as operações dos revendedores.</p>
         </div>
-        <a href="{{ route('admin.products.create') }}" class="btn btn-cyan">Novo produto</a>
+        <a href="{{ route('admin.products.create') }}" class="btn btn-brand">Novo produto</a>
     </section>
 
     <section class="panel mt-6">
@@ -18,7 +18,7 @@
                     <tbody>
                         @foreach ($productList as $product)
                             <tr>
-                                <td><span class="font-mono font-medium text-cyan-700">{{ data_get($product, 'sku', '—') }}</span></td>
+                                <td><span class="font-mono font-medium text-brand-700">{{ data_get($product, 'sku', '—') }}</span></td>
                                 <td>
                                     <p class="font-medium text-navy-950">{{ data_get($product, 'name', 'Produto') }}</p>
                                     <p class="mt-1 max-w-sm truncate text-xs text-slate-500">{{ data_get($product, 'description', 'Sem descrição') }}</p>
@@ -26,7 +26,7 @@
                                 <td class="font-mono">R$ {{ number_format((float) data_get($product, 'price', 0), 2, ',', '.') }}</td>
                                 <td class="font-mono">{{ data_get($product, 'stock', 0) }}</td>
                                 <td><x-status-badge :status="data_get($product, 'is_active', false) ? 'active' : 'inactive'" /></td>
-                                <td class="text-right"><a href="{{ route('admin.products.edit', $product) }}" class="text-sm font-medium text-cyan-700 hover:text-cyan-800">Editar</a></td>
+                                <td class="text-right"><a href="{{ route('admin.products.edit', $product) }}" class="text-sm font-medium text-brand-700 hover:text-brand-800">Editar</a></td>
                             </tr>
                         @endforeach
                     </tbody>

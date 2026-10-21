@@ -87,7 +87,7 @@
                                 </td>
                                 <td>
                                     @if ($isAvailable)
-                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button"><x-icon name="plus" width="1em" height="1em" class="inline-block align-middle" /> Carrinho</button>
+                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button"><x-icon name="plus" size="1em" /> Carrinho</button>
                                     @else
                                         <button type="button" class="catalog-add-button" disabled>Indisponível</button>
                                     @endif
