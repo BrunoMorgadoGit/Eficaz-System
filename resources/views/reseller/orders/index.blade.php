@@ -112,7 +112,7 @@
                 </article>
             @else
                 <div class="orders-detail-placeholder">
-                    <x-icon name="files" class="text-[#0755f8]" />
+                    <x-icon name="files" class="text-brand-500" />
                     <p>{{ count($orderList) ? 'Selecione um pedido para ver os detalhes' : 'Seus pedidos aparecerão aqui' }}</p>
                 </div>
             @endif

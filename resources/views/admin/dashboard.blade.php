@@ -18,14 +18,14 @@
                 <h1 class="page-title">Panorama da operação</h1>
                 <p class="page-subtitle">Acompanhe os indicadores centrais da plataforma e priorize os próximos movimentos comerciais.</p>
             </div>
-            <a href="{{ route('admin.products.create') }}" class="btn btn-cyan">Cadastrar produto</a>
+            <a href="{{ route('admin.products.create') }}" class="btn btn-brand">Cadastrar produto</a>
         </section>
 
         <section class="admin-dashboard-metrics mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores da plataforma">
-            <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" tone="cyan" icon="orders" />
-            <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" tone="cyan" icon="revenue" />
-            <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" tone="cyan" icon="products" />
-            <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" tone="cyan" icon="resellers" />
+            <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" icon="clipboard-list" />
+            <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" icon="coin" />
+            <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" icon="package" />
+            <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" icon="users" />
         </section>
 
         <section class="admin-dashboard-main-grid mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
@@ -35,12 +35,12 @@
                         <h2 class="panel-title">Evolução de pedidos</h2>
                         <p class="panel-subtitle">Tendência recente de pedidos registrados.</p>
                     </div>
-                    <span class="admin-dashboard-chart-badge rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700">Pedidos</span>
+                    <span class="admin-dashboard-chart-badge rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700">Pedidos</span>
                 </div>
-                <div class="admin-dashboard-chart-frame relative mt-6 rounded-xl border border-slate-100 bg-slate-25 p-3 sm:p-5">
+                <div class="admin-dashboard-chart-frame relative mt-6 rounded-xl border border-slate-100 p-3 sm:p-5">
                     <svg viewBox="0 0 300 132" class="h-44 w-full overflow-visible" role="img" aria-label="Gráfico de tendência dos pedidos">
-                        <path d="M16 20H284M16 64H284M16 108H284" stroke="#dbe7ef" stroke-width="1" stroke-dasharray="3 5"/>
-                        <polyline points="{{ $trendPoints }}" fill="none" stroke="#0755f8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 20H284M16 64H284M16 108H284" stroke="var(--color-ink-300)" stroke-width="1" stroke-dasharray="3 5"/>
+                        <polyline points="{{ $trendPoints }}" fill="none" stroke="var(--color-brand-500)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                         @if ($trendValues->count() > 1)
                             @php
                                 $columnWidth = round(268 / max(1, $trendValues->count() - 1), 1);
@@ -62,7 +62,7 @@
                                     <!-- Glow / Halo on hover -->
                                     <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="9" fill="#0755f8" class="chart-halo" />
                                     <!-- Main dot -->
-                                    <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="4" fill="#0a2540" stroke="#fff" stroke-width="2" class="chart-dot" />
+                                    <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="4" fill="var(--color-ink-900)" stroke="var(--color-white)" stroke-width="2" class="chart-dot" />
                                     <!-- Month label -->
                                     @if ($pointLabel)
                                         <text x="{{ $pointX }}" y="124" fill="#94a3b8" font-size="8" font-family="sans-serif" font-weight="600" text-anchor="middle" class="select-none uppercase tracking-wider">{{ $pointLabel }}</text>
@@ -94,9 +94,9 @@
                 <h2 class="panel-title">Atalhos de gestão</h2>
                 <p class="panel-subtitle">Acesse rapidamente as rotinas mais frequentes.</p>
                 <div class="admin-dashboard-shortcuts mt-5 space-y-3">
-                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Gerenciar catálogo</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
-                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
-                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-brand-400 hover:bg-brand-50"><span>Gerenciar catálogo</span><span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
+                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-brand-400 hover:bg-brand-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
+                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-brand-400 hover:bg-brand-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </div>
             </article>
         </section>
@@ -107,7 +107,7 @@
                     <h2 class="panel-title">Pedidos recentes</h2>
                     <p class="panel-subtitle">Últimas movimentações comerciais recebidas pela plataforma.</p>
                 </div>
-                <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-cyan-700 hover:text-cyan-800">Ver pedidos</a>
+                <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-brand-700 hover:text-brand-800">Ver pedidos</a>
             </div>
             @if (count($recentOrders))
                 <div class="data-table-wrap">

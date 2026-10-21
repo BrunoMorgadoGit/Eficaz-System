@@ -89,7 +89,7 @@
             <article class="dashboard-list-panel">
                 <header class="dashboard-list-heading">
                     <h2>Pedidos recentes</h2>
-                    <a href="{{ route('reseller.orders.index') }}">Ver todos <span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('reseller.orders.index') }}">Ver todos <span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </header>
 
                 @forelse ($recentOrders as $order)
@@ -112,7 +112,7 @@
             <article class="dashboard-list-panel">
                 <header class="dashboard-list-heading">
                     <h2>Orçamentos</h2>
-                    <a href="{{ route('reseller.cart.index') }}">Novo orçamento <span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('reseller.cart.index') }}">Novo orçamento <span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </header>
 
                 @forelse ($recentQuotes as $quote)

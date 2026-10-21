@@ -1,0 +1,39 @@
+/*
+ * Design tokens. Each one becomes a Tailwind utility (e.g. `bg-brand-500`, `text-ink-600`)
+ * and a CSS variable (e.g. `var(--color-ink-300)`).
+ * Status colors (emerald, yellow, red), white, font weights, and shadows use Tailwind defaults.
+ */
+@theme {
+    --font-sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --font-heading: "Barlow Semi Condensed", "Arial Narrow", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Brand: Eficaz blue. */
+    --color-brand-50: #eef3ff;
+    --color-brand-100: #dce6ff;
+    --color-brand-200: #bbceff;
+    --color-brand-300: #7799ff;
+    --color-brand-400: #5b85ff;
+    --color-brand-500: #0755f8;
+    --color-brand-600: #064bdc;
+    --color-brand-700: #073ba7;
+    --color-brand-800: #062e82;
+
+    /* Dark surfaces: sidebar, login panel, and primary buttons. */
+    --color-navy-700: #375472;
+    --color-navy-800: #23344e;
+    --color-navy-900: #151d2e;
+    --color-navy-950: #0b1020;
+
+    /* Neutrals: backgrounds (50-100), borders (200-400), and text (500-900). */
+    --color-ink-50: #f8fafc;
+    --color-ink-100: #f5f7fb;
+    --color-ink-200: #e4eaf1;
+    --color-ink-300: #dce4ed;
+    --color-ink-400: #bac8dd;
+    --color-ink-500: #98a6b7;
+    --color-ink-600: #718198;
+    --color-ink-700: #52657d;
+    --color-ink-800: #34445a;
+    --color-ink-900: #10243b;
+}

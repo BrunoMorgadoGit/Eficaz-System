@@ -35,7 +35,7 @@
                                                 <option value="{{ $value }}" @selected(data_get($order, 'status') === $value)>{{ $label }}</option>
                                             @endforeach
                                         </select>
-                                        <button type="submit" class="text-xs font-medium text-cyan-700 hover:text-cyan-800">Salvar</button>
+                                        <button type="submit" class="text-xs font-medium text-brand-700 hover:text-brand-800">Salvar</button>
                                     </form>
                                 </td>
                             </tr>
