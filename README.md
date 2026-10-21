@@ -217,8 +217,8 @@ O `docker-compose.yml` pré-configurado expõe o MySQL 8.4 na porta **3308** (`1
 | Perfil | E-mail | Senha |
 |---|---|---|
 | Administrador | `admin@eficaz.test` | `password` |
-| Revendedor GOLD | `revendedor@eficaz.test` | `password` |
-
+| Revendedor  | `revendedor@eficaz.test` | `password` |
+co
 > ⚠️ Essas contas são exclusivas para ambiente de demonstração. Não use essas credenciais em produção.
 
 ---

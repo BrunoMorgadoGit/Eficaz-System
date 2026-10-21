@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Eficaz B2B' }}</title>
-    @vite('resources/css/app.css')
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
+    @vite(['resources/css/app.css', 'resources/js/sidebar.js'])
 </head>
 <body>
     @php
@@ -77,69 +80,130 @@
         }
     @endphp
 
-    <div class="page-shell lg:flex">
-        <aside class="app-sidebar" aria-label="Navegação principal">
-            <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup brand-lockup--sidebar" aria-label="Eficaz B2B, página inicial">
-                <span class="sidebar-brand-icon" aria-hidden="true">
-                    <img src="{{ asset('image/icon.png') }}" alt="" width="1254" height="1254">
-                </span>
-                <span class="sidebar-brand-copy">
-                    <strong>EFICAZ</strong>
-                    <small>PORTAL B2B</small>
-                </span>
-            </a>
+    {{-- Mobile overlay --}}
+    <div id="sidebar-overlay" class="sidebar-overlay" aria-hidden="true"></div>
 
+    <div class="page-shell lg:flex">
+        <aside id="app-sidebar" class="app-sidebar" aria-label="Navegação principal">
+
+            {{-- Brand + toggle button --}}
+            <div class="sidebar-header">
+                <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}"
+                   class="brand-lockup brand-lockup--sidebar"
+                   aria-label="Eficaz B2B, página inicial">
+                    <span class="sidebar-brand-logo sidebar-brand-logo--expanded" aria-hidden="true">
+                        <img src="{{ asset('image/logo.png') }}" alt="" width="2172" height="724">
+                    </span>
+                    <span class="sidebar-brand-logo sidebar-brand-logo--collapsed" aria-hidden="true">
+                        <img src="{{ asset('image/icon.png') }}" alt="" width="1254" height="1254">
+                    </span>
+                </a>
+                <button id="sidebar-toggle"
+                        class="sidebar-toggle-btn"
+                        type="button"
+                        aria-label="Recolher menu"
+                        aria-pressed="false">
+                    {{-- Chevron left icon --}}
+                    <svg class="sidebar-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Nav items --}}
             @if ($isAdmin)
-                <p class="sidebar-section-label">Operação</p>
-                <nav class="space-y-1">
-                    <a href="{{ route('admin.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg> Visão geral
+                <p class="sidebar-section-label"><span class="sidebar-section-label-text">Operação</span></p>
+                <nav class="sidebar-nav" aria-label="Menu administrativo">
+                    <a href="{{ route('admin.dashboard') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])
+                       title="Visão geral">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Visão geral</span>
                     </a>
-                    <a href="{{ route('admin.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4m8-14v10l-8 4m0-10v10" stroke-linejoin="round"/></svg> Catálogo
+                    <a href="{{ route('admin.products.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])
+                       title="Catálogo">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4m8-14v10l-8 4m0-10v10" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Catálogo</span>
                     </a>
-                    <a href="{{ route('admin.resellers.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1m11-9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm3 4a4 4 0 0 1 4 4v1" stroke-linecap="round"/></svg> Revendedores
+                    <a href="{{ route('admin.resellers.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])
+                       title="Revendedores">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1m11-9a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm3 4a4 4 0 0 1 4 4v1" stroke-linecap="round"/></svg>
+                        <span class="nav-label">Revendedores</span>
                     </a>
-                    <a href="{{ route('admin.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M7 3h10l3 4v14H4V7l3-4Zm-3 4h16M8 11h8" stroke-linejoin="round"/></svg> Pedidos
+                    <a href="{{ route('admin.orders.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])
+                       title="Pedidos">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10l3 4v14H4V7l3-4Zm-3 4h16M8 11h8" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Pedidos</span>
                     </a>
                 </nav>
             @else
-                <p class="sidebar-section-label">Revendedor</p>
-                <nav class="space-y-1">
-                    <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg> Visão geral
+                <p class="sidebar-section-label"><span class="sidebar-section-label-text">Revendedor</span></p>
+                <nav class="sidebar-nav" aria-label="Menu revendedor">
+                    <a href="{{ route('reseller.dashboard') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])
+                       title="Visão geral">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-3H4v3Z" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Visão geral</span>
                     </a>
-                    <a href="{{ route('reseller.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4m8-14v10l-8 4m8-14v10l-8 4m0-10v10" stroke-linejoin="round"/></svg> Produtos
+                    <a href="{{ route('reseller.products.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])
+                       title="Produtos">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="m4 7 8-4 8 4-8 4-8-4Zm0 0v10l8 4m8-14v10l-8 4m8-14v10l-8 4m0-10v10" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Produtos</span>
                     </a>
-                    <a href="{{ route('reseller.cart.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'cart'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7M10 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm9 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg> Carrinho
+                    <a href="{{ route('reseller.cart.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'cart'])
+                       title="Carrinho">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H7M10 20a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm9 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Carrinho</span>
                         @if ($cartProductCount > 0)<span class="sidebar-cart-count">{{ $cartProductCount }}</span>@endif
                     </a>
-                    <a href="{{ $quoteNavHref }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z" stroke-linejoin="round"/><path d="M15 3v5h5M9 12h7m-7 4h7" stroke-linecap="round"/></svg> Orçamento
+                    <a href="{{ $quoteNavHref }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])
+                       title="Orçamento">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l4 4v14H6z" stroke-linejoin="round"/><path d="M15 3v5h5M9 12h7m-7 4h7" stroke-linecap="round"/></svg>
+                        <span class="nav-label">Orçamento</span>
                     </a>
-                    <a href="{{ route('reseller.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>
-                        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.8"><path d="M7 3h10l3 4v14H4V7l3-4Zm-3 4h16M8 11h8" stroke-linejoin="round"/></svg> Meus pedidos
+                    <a href="{{ route('reseller.orders.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])
+                       title="Meus pedidos">
+                        <svg viewBox="0 0 24 24" class="nav-icon fill-none stroke-current" stroke-width="1.8" aria-hidden="true"><path d="M7 3h10l3 4v14H4V7l3-4Zm-3 4h16M8 11h8" stroke-linejoin="round"/></svg>
+                        <span class="nav-label">Meus pedidos</span>
                     </a>
                 </nav>
             @endif
 
+            {{-- User area --}}
             <div class="sidebar-user">
-                <p class="truncate text-sm font-semibold text-white">{{ $displayName }}</p>
-                @if ($currentReseller)
-                    <p class="mt-0.5 truncate text-xs text-slate-400">{{ $currentReseller->company_name }}</p>
-                    <p class="mt-1 text-[10px] font-bold uppercase tracking-wider text-cyan-400">{{ $currentReseller->commercial_profile }}</p>
-                @else
-                    <p class="mt-0.5 truncate text-xs text-slate-400">{{ $displayEmail }}</p>
-                @endif
-                <div class="mt-3 flex items-center justify-between gap-2">
-                    <a href="{{ route('profile') }}" class="text-xs font-semibold text-cyan-400 hover:text-cyan-300">Meu perfil</a>
-                    <form method="POST" action="{{ route('logout') }}">
+                <div class="sidebar-user-header">
+                    <div class="sidebar-user-avatar" aria-hidden="true">
+                        {{ mb_strtoupper(mb_substr($displayName, 0, 1)) }}
+                    </div>
+                    <div class="sidebar-user-info">
+                        <p class="sidebar-user-name">{{ $displayName }}</p>
+                        @if ($currentReseller)
+                            <p class="sidebar-user-sub">{{ $currentReseller->company_name }}</p>
+                            <p class="sidebar-user-role">{{ $currentReseller->commercial_profile }}</p>
+                        @else
+                            <p class="sidebar-user-sub">{{ $displayEmail }}</p>
+                            <p class="sidebar-user-role">Administrador</p>
+                        @endif
+                    </div>
+                </div>
+                <div class="sidebar-user-actions">
+                    <a href="{{ route('profile') }}" class="sidebar-user-link" title="Meu perfil">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span class="nav-label">Perfil</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="sidebar-logout-form">
                         @csrf
-                        <button type="submit" class="text-xs font-semibold text-slate-300 hover:text-white">Sair</button>
+                        <button type="submit" class="sidebar-user-link sidebar-logout-btn" title="Sair">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span class="nav-label">Sair</span>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -212,8 +276,22 @@
                         <a href="{{ route('reseller.products.index') }}">+ Adicionar produtos</a>
                     </div>
                 @endif
-                <div class="flex items-center justify-between gap-4 lg:hidden">
-                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}" class="brand-lockup brand-lockup--mobile" aria-label="Eficaz B2B, página inicial">
+
+                {{-- Mobile topbar --}}
+                <div class="mobile-topbar lg:hidden">
+                    <button id="mobile-menu-btn"
+                            class="mobile-menu-btn"
+                            type="button"
+                            aria-label="Abrir menu"
+                            aria-expanded="false"
+                            aria-controls="app-sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M3 12h18M3 6h18M3 18h18"/>
+                        </svg>
+                    </button>
+                    <a href="{{ $isAdmin ? route('admin.dashboard') : route('reseller.dashboard') }}"
+                       class="brand-lockup brand-lockup--mobile"
+                       aria-label="Eficaz B2B, página inicial">
                         <img src="{{ asset('image/logo.png') }}" alt="" class="mobile-brand-image" width="2172" height="724">
                     </a>
                     <form method="POST" action="{{ route('logout') }}">
@@ -221,6 +299,7 @@
                         <button type="submit" class="btn btn-secondary min-h-8 px-3 py-1.5 text-xs">Sair</button>
                     </form>
                 </div>
+
                 <nav class="mobile-nav mt-3" aria-label="Navegação móvel">
                     @if ($isAdmin)
                         <a href="{{ route('admin.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>
