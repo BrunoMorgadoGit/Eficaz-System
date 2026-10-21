@@ -15,7 +15,7 @@
 
     <form method="GET" action="{{ route('reseller.products.index') }}" class="catalog-toolbar">
         <div class="catalog-search-wrap">
-            <svg viewBox="0 0 24 24" class="catalog-search-icon" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4" stroke-linecap="round"/></svg>
+            <x-icon name="search" class="catalog-search-icon" stroke-width="1.8" />
             <label for="catalog-search" class="sr-only">Buscar produto pelo SKU</label>
             <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU...">
             <button type="submit" class="sr-only">Buscar</button>
@@ -89,7 +89,7 @@
                                 </td>
                                 <td>
                                     @if ($isAvailable)
-                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button">+ Carrinho</button>
+                                        <button type="submit" form="add-to-cart-{{ data_get($product, 'id') }}" class="catalog-add-button"><x-icon name="plus" width="1em" height="1em" class="inline-block align-middle" /> Carrinho</button>
                                     @else
                                         <button type="button" class="catalog-add-button" disabled>Indisponível</button>
                                     @endif
