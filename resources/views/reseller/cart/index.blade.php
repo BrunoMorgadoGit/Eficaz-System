@@ -19,7 +19,7 @@
                 <h1>Carrinho</h1>
                 <p>{{ $productCount }} {{ $productCount === 1 ? 'produto selecionado' : 'produtos selecionados' }}</p>
             </div>
-            <a href="{{ route('reseller.products.index') }}">+ Adicionar produtos</a>
+            <a href="{{ route('reseller.products.index') }}"><x-icon name="plus" width="1em" height="1em" class="inline-block align-middle" /> Adicionar produtos</a>
         </div>
 
         @if ($productCount > 0)
@@ -104,7 +104,7 @@
             </div>
         @else
             <section class="cart-empty-panel">
-                <div class="cart-empty-icon" aria-hidden="true">🛒</div>
+                <div class="cart-empty-icon" aria-hidden="true"><x-icon name="shopping-cart" width="1em" height="1em" class="inline-block align-middle" /></div>
                 <h2>Seu carrinho está vazio</h2>
                 <p>Adicione produtos do catálogo para montar seu próximo orçamento.</p>
                 <a href="{{ route('reseller.products.index') }}" class="cart-quote-button">Adicionar produtos</a>

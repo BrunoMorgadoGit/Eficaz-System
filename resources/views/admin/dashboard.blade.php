@@ -94,9 +94,9 @@
                 <h2 class="panel-title">Atalhos de gestão</h2>
                 <p class="panel-subtitle">Acesse rapidamente as rotinas mais frequentes.</p>
                 <div class="admin-dashboard-shortcuts mt-5 space-y-3">
-                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Gerenciar catálogo</span><span aria-hidden="true">→</span></a>
-                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Consultar revendedores</span><span aria-hidden="true">→</span></a>
-                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Atualizar pedidos</span><span aria-hidden="true">→</span></a>
+                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Gerenciar catálogo</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
                 </div>
             </article>
         </section>

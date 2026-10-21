@@ -112,7 +112,7 @@
                 </article>
             @else
                 <div class="orders-detail-placeholder">
-                    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M9 4h10l6 6v18H9z" fill="#fff" stroke="#75869a" stroke-width="1.4"/><path d="M19 4v7h6M12 15h10M12 19h10M12 23h7" stroke="#0755f8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 7v21h17" stroke="#75869a" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    <x-icon name="files" class="text-[#0755f8]" />
                     <p>{{ count($orderList) ? 'Selecione um pedido para ver os detalhes' : 'Seus pedidos aparecerão aqui' }}</p>
                 </div>
             @endif
