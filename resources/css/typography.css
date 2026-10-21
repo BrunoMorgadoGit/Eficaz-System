@@ -1,0 +1,83 @@
+@font-face {
+    font-family: 'Barlow Semi Condensed';
+    src: url('../fonts/barlow-semi-condensed/barlow-semi-condensed-600.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Barlow Semi Condensed';
+    src: url('../fonts/barlow-semi-condensed/barlow-semi-condensed-700.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans';
+    src: url('../fonts/ibm-plex-sans/ibm-plex-sans-400.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans';
+    src: url('../fonts/ibm-plex-sans/ibm-plex-sans-500.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/ibm-plex-mono/ibm-plex-mono-400.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/ibm-plex-mono/ibm-plex-mono-500.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+}
+
+@layer base {
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        font-weight: 600;
+    }
+
+    strong, b {
+        font-weight: 500;
+    }
+
+    code, kbd, samp {
+        font-family: var(--font-mono);
+    }
+}
+
+@layer components {
+    .eyebrow, .sidebar-section-label,
+    .dashboard-stat-label, .dashboard-credit-label,
+    .login-intro-brand, .login-intro-eyebrow, .login-eyebrow {
+        font-family: var(--font-heading);
+        font-weight: 600;
+    }
+
+    .dashboard-stat-value {
+        font-family: var(--font-heading);
+        font-weight: 700;
+    }
+
+    input[name='sku'], input[type='number'],
+    .dashboard-credit-value, .dashboard-credit-total strong, .dashboard-row-total,
+    .catalog-mobile-sku, .catalog-mobile-facts dd,
+    .orders-card-date, .orders-selected-meta strong, .orders-selected-item small {
+        font-family: var(--font-mono);
+    }
+}

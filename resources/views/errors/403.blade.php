@@ -20,7 +20,7 @@
             <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-red-50 text-red-700" aria-hidden="true">
                 <x-icon name="alert-triangle" class="h-7 w-7 fill-none stroke-current" stroke-width="1.8" />
             </span>
-            <p class="mt-6 text-xs font-bold uppercase tracking-[0.16em] text-red-700">Erro 403</p>
+            <p class="mt-6 text-xs font-medium uppercase tracking-[0.16em] text-red-700">Erro 403</p>
             <h1 class="mt-2 text-2xl font-bold tracking-tight text-navy-950 sm:text-3xl">Você não tem acesso a esta área.</h1>
             <p class="mt-4 text-sm leading-6 text-slate-500">Seu perfil não possui permissão para realizar esta ação. Volte ao seu painel ou entre com uma conta autorizada.</p>
             <a href="{{ $returnRoute }}" class="btn btn-cyan mt-7">{{ $returnLabel }}</a>

@@ -66,7 +66,7 @@
                                                 <span class="quote-item-description">{{ data_get($item, 'description') }}</span>
                                             @endif
                                         </td>
-                                        <td>{{ data_get($item, 'quantity', 0) }}</td>
+                                        <td class="font-mono">{{ data_get($item, 'quantity', 0) }}</td>
                                         <td class="quote-item-price">R$ {{ number_format((float) data_get($item, 'unit_price', 0), 2, ',', '.') }}</td>
                                         <td class="quote-item-total">R$ {{ number_format((float) data_get($item, 'line_total', 0), 2, ',', '.') }}</td>
                                     </tr>

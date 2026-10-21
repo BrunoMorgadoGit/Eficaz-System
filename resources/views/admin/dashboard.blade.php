@@ -34,7 +34,7 @@
                         <h2 class="panel-title">Evolução de pedidos</h2>
                         <p class="panel-subtitle">Tendência recente de pedidos registrados.</p>
                     </div>
-                    <span class="admin-dashboard-chart-badge rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-700">Pedidos</span>
+                    <span class="admin-dashboard-chart-badge rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700">Pedidos</span>
                 </div>
                 <div class="admin-dashboard-chart-frame mt-6 overflow-hidden rounded-xl border border-slate-100 bg-slate-25 p-3 sm:p-5">
                     <svg viewBox="0 0 300 130" class="h-44 w-full" role="img" aria-label="Gráfico de tendência dos pedidos">
@@ -61,9 +61,9 @@
                 <h2 class="panel-title">Atalhos de gestão</h2>
                 <p class="panel-subtitle">Acesse rapidamente as rotinas mais frequentes.</p>
                 <div class="admin-dashboard-shortcuts mt-5 space-y-3">
-                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Gerenciar catálogo</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
-                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
-                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.products.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Gerenciar catálogo</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
+                    <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-cyan-400 hover:bg-cyan-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" width="1em" height="1em" class="inline-block align-middle" /></span></a>
                 </div>
             </article>
         </section>
@@ -74,7 +74,7 @@
                     <h2 class="panel-title">Pedidos recentes</h2>
                     <p class="panel-subtitle">Últimas movimentações comerciais recebidas pela plataforma.</p>
                 </div>
-                <a href="{{ route('admin.orders.index') }}" class="text-sm font-bold text-cyan-700 hover:text-cyan-800">Ver pedidos</a>
+                <a href="{{ route('admin.orders.index') }}" class="text-sm font-medium text-cyan-700 hover:text-cyan-800">Ver pedidos</a>
             </div>
             @if (count($recentOrders))
                 <div class="data-table-wrap">
@@ -83,10 +83,10 @@
                         <tbody>
                             @foreach ($recentOrders as $order)
                                 <tr>
-                                    <td class="font-bold text-navy-950">#{{ data_get($order, 'id', '—') }}</td>
+                                    <td class="font-mono font-medium text-navy-950">#{{ data_get($order, 'id', '—') }}</td>
                                     <td>{{ data_get($order, 'reseller.company_name', data_get($order, 'reseller_name', '—')) }}</td>
                                     <td><x-status-badge :status="data_get($order, 'status', 'PENDENTE')" /></td>
-                                    <td class="text-right font-bold text-navy-950">R$ {{ number_format((float) data_get($order, 'total', 0), 2, ',', '.') }}</td>
+                                    <td class="font-mono text-right font-medium text-navy-950">R$ {{ number_format((float) data_get($order, 'total', 0), 2, ',', '.') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -18,8 +18,8 @@
 <article {{ $attributes->merge(['class' => 'stat-card']) }}>
     <div class="flex items-start justify-between gap-4">
         <div>
-            <p class="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">{{ $label }}</p>
-            <p class="mt-3 text-2xl font-bold tracking-tight text-navy-950">{{ $value }}</p>
+            <p class="text-xs font-heading font-semibold uppercase tracking-[0.12em] text-slate-500">{{ $label }}</p>
+            <p class="mt-3 text-2xl font-heading font-bold tracking-tight text-navy-950">{{ $value }}</p>
         </div>
         <span class="stat-icon {{ $tones[$tone] ?? $tones['cyan'] }}" aria-hidden="true">
             @switch($icon)
