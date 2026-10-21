@@ -69,7 +69,7 @@ class AuthController extends Controller
     {
         $this->logoutSession($request);
 
-        return redirect()->route('login')->with('success', 'Sessão encerrada com sucesso.');
+        return redirect()->route('login')->with('success', 'Você saiu da conta.');
     }
 
     public function profile(Request $request): View

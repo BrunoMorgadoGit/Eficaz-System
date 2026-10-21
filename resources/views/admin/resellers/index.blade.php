@@ -26,7 +26,7 @@
                                     <p class="font-medium text-slate-700">{{ data_get($user, 'name', '—') }}</p>
                                     <p class="mt-1 text-xs text-slate-500">{{ data_get($user, 'email', '—') }}</p>
                                 </td>
-                                <td><span class="font-mono rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-800">{{ data_get($reseller, 'commercial_profile', 'STANDARD') }}</span></td>
+                                <td><span class="font-mono text-xs font-medium text-slate-600">{{ data_get($reseller, 'commercial_profile', 'STANDARD') }}</span></td>
                                 <td class="font-mono font-medium text-navy-950">R$ {{ number_format((float) data_get($reseller, 'credit_limit', 0), 2, ',', '.') }}</td>
                                 <td><x-status-badge :status="data_get($reseller, 'is_active', false) ? 'active' : 'inactive'" /></td>
                             </tr>

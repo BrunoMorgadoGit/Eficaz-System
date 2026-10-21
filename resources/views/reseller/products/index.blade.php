@@ -66,9 +66,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span @class(['catalog-status', 'catalog-status--active' => $isActive, 'catalog-status--inactive' => ! $isActive])>
-                                        <span aria-hidden="true"></span>{{ $isActive ? 'Ativo' : 'Inativo' }}
-                                    </span>
+                                    <x-status-badge :status="$isActive ? 'active' : 'inactive'" />
                                 </td>
                                 <td>
                                     <form id="add-to-cart-{{ data_get($product, 'id') }}" method="POST" action="{{ route('reseller.cart.items.store') }}" class="catalog-add-form">
@@ -112,9 +110,7 @@
                                 <p class="catalog-mobile-sku">SKU {{ data_get($product, 'sku', '—') }}</p>
                                 <h2 id="mobile-product-{{ data_get($product, 'id') }}">{{ data_get($product, 'name', 'Produto') }}</h2>
                             </div>
-                            <span @class(['catalog-status', 'catalog-status--active' => $isActive, 'catalog-status--inactive' => ! $isActive])>
-                                <span aria-hidden="true"></span>{{ $isActive ? 'Ativo' : 'Inativo' }}
-                            </span>
+                            <x-status-badge :status="$isActive ? 'active' : 'inactive'" />
                         </header>
 
                         @if (data_get($product, 'description'))

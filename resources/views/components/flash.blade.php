@@ -1,6 +1,6 @@
 @if (session('success'))
     <div class="flash flash-success" role="status">
-        <x-icon name="check" class="mt-0.5 h-5 w-5 shrink-0 fill-none stroke-current" stroke-width="2" />
+        <x-icon name="check" class="h-4 w-4 shrink-0 text-emerald-700" stroke-width="2" />
         <p>{{ session('success') }}</p>
     </div>
 @endif
