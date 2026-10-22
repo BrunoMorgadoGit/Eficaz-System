@@ -49,3 +49,29 @@
         <button type="submit" class="btn btn-brand">{{ $submitLabel }}</button>
     </div>
 </form>
+
+<script>
+    (function () {
+        const skuInput = document.getElementById('sku');
+        if (!skuInput) return;
+
+        skuInput.addEventListener('keydown', function (event) {
+            if (event.key === ' ' || event.code === 'Space') {
+                event.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.setRangeText('-', start, end, 'end');
+                this.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+
+        skuInput.addEventListener('input', function () {
+            if (/\s/.test(this.value)) {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.replace(/\s+/g, '-');
+                this.setSelectionRange(start, end);
+            }
+        });
+    })();
+</script>

@@ -1605,6 +1605,48 @@
     .admin-dashboard-chart-badge {
         border: 1px solid var(--color-brand-100);
         background: var(--color-brand-50);
+  }
+
+    .chart-point-group {
+        outline: none;
+    }
+
+    .chart-guide {
+        opacity: 0;
+        transition: opacity 150ms ease;
+    }
+
+    .chart-halo {
+        opacity: 0;
+        transition: opacity 150ms ease, r 150ms ease;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .chart-dot {
+        transition: fill 150ms ease, r 150ms ease;
+        transform-box: fill-box;
+        transform-origin: center;
+    }
+
+    .chart-point-group:hover .chart-guide,
+    .chart-point-group:focus .chart-guide,
+    .chart-point-group.is-active .chart-guide {
+        opacity: 0.85;
+    }
+
+    .chart-point-group:hover .chart-halo,
+    .chart-point-group:focus .chart-halo,
+    .chart-point-group.is-active .chart-halo {
+        opacity: 0.22;
+        r: 9;
+    }
+
+    .chart-point-group:hover .chart-dot,
+    .chart-point-group:focus .chart-dot,
+    .chart-point-group.is-active .chart-dot {
+        fill: #0755f8;
+        r: 5.5;
     }
 
     .admin-dashboard-shortcut {

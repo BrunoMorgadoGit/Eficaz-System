@@ -10,14 +10,15 @@
 
     <div class="catalog-mobile-heading lg:hidden">
         <h1>Catálogo de Produtos</h1>
-        <p>Busque pelo SKU do produto</p>
+        <p>Busque pelo SKU ou nome do produto</p>
     </div>
 
     <form method="GET" action="{{ route('reseller.products.index') }}" class="catalog-toolbar">
         <div class="catalog-search-wrap">
             <x-icon name="search" class="catalog-search-icon" />
-            <label for="catalog-search" class="sr-only">Buscar produto pelo SKU</label>
-            <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU...">
+            <label for="catalog-search" class="sr-only">Buscar produto pelo SKU ou nome</label>
+            <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU ou nome...">
+
             <button type="submit" class="sr-only">Buscar</button>
         </div>
         <p class="catalog-result-count" aria-live="polite">{{ $resultCount }} {{ $resultCount === 1 ? 'produto encontrado' : 'produtos encontrados' }}</p>

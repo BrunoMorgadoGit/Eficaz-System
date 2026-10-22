@@ -22,7 +22,7 @@ class SearchProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->filled('sku')) {
-            $this->merge(['sku' => strtoupper(trim((string) $this->input('sku')))]);
+            $this->merge(['sku' => trim((string) $this->input('sku'))]);
         }
     }
 }
