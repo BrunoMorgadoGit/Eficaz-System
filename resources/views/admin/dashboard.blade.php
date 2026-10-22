@@ -39,6 +39,7 @@
                 </div>
                 <div class="admin-dashboard-chart-frame relative mt-6 rounded-xl border border-slate-100 p-3 sm:p-5">
                     <svg viewBox="0 0 300 132" class="h-44 w-full overflow-visible" role="img" aria-label="Gráfico de tendência dos pedidos">
+
                         <path d="M16 20H284M16 64H284M16 108H284" stroke="var(--color-ink-300)" stroke-width="1" stroke-dasharray="3 5"/>
                         <polyline points="{{ $trendPoints }}" fill="none" stroke="var(--color-brand-500)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                         @if ($trendValues->count() > 1)
@@ -69,6 +70,7 @@
                                     @endif
                                     <title>{{ ucfirst($pointLabel) ? ucfirst($pointLabel) . ': ' : '' }}{{ $orderText }}</title>
                                 </g>
+                                <circle cx="{{ $pointX }}" cy="{{ $pointY }}" r="4" fill="var(--color-ink-900)" stroke="var(--color-white)" stroke-width="2"/>
                             @endforeach
                         @endif
                     </svg>

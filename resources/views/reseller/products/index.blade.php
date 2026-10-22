@@ -18,6 +18,7 @@
             <x-icon name="search" class="catalog-search-icon" />
             <label for="catalog-search" class="sr-only">Buscar produto pelo SKU ou nome</label>
             <input id="catalog-search" name="sku" value="{{ $search }}" class="catalog-search-input" placeholder="Buscar por SKU ou nome...">
+
             <button type="submit" class="sr-only">Buscar</button>
         </div>
         <p class="catalog-result-count" aria-live="polite">{{ $resultCount }} {{ $resultCount === 1 ? 'produto encontrado' : 'produtos encontrados' }}</p>
