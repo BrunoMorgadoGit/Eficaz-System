@@ -59,6 +59,17 @@
         } elseif ($isAdmin && request()->routeIs('admin.resellers.index')) {
             $moduleHeaderTitle = 'Revendedores';
             $moduleHeaderDescription = 'Consulte os perfis comerciais e o limite de crédito das empresas cadastradas.';
+        } elseif ($isAdmin && request()->routeIs('admin.users.index')) {
+            $moduleHeaderTitle = 'Usuários';
+            $moduleHeaderDescription = 'Gerencie os acessos de administradores e revendedores do portal.';
+            $moduleHeaderActionLabel = 'Adicionar usuário';
+            $moduleHeaderActionRoute = route('admin.users.create');
+            $moduleHeaderActionPrimary = true;
+        } elseif ($isAdmin && request()->routeIs('admin.users.create')) {
+            $moduleHeaderTitle = 'Adicionar usuário';
+            $moduleHeaderDescription = 'Cadastre o perfil de acesso e envie um link para criação de senha.';
+            $moduleHeaderActionLabel = 'Voltar para usuários';
+            $moduleHeaderActionRoute = route('admin.users.index');
         } elseif ($isAdmin && request()->routeIs('admin.orders.index')) {
             $moduleHeaderTitle = 'Pedidos';
             $moduleHeaderDescription = 'Acompanhe os pedidos e atualize seu status operacional.';
@@ -129,6 +140,12 @@
                        title="Revendedores">
                         <x-icon name="users" class="nav-icon" />
                         <span class="nav-label">Revendedores</span>
+                    </a>
+                    <a href="{{ route('admin.users.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'users'])
+                       title="Usuários">
+                        <x-icon name="users" class="nav-icon" />
+                        <span class="nav-label">Usuários</span>
                     </a>
                     <a href="{{ route('admin.orders.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])
@@ -301,6 +318,7 @@
                         <a href="{{ route('admin.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>
                         <a href="{{ route('admin.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>Catálogo</a>
                         <a href="{{ route('admin.resellers.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])>Revendedores</a>
+                        <a href="{{ route('admin.users.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'users'])>Usuários</a>
                         <a href="{{ route('admin.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>Pedidos</a>
                     @else
                         <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>

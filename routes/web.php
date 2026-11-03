@@ -4,12 +4,15 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\AdminProductController;
 use App\Http\Controllers\AdminResellerController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PasswordSetupController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ResellerDashboardController;
 use App\Http\Controllers\ResellerProductController;
+use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,13 +28,20 @@ Route::get('/', function (Request $request) {
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::get('/senha/nova/{token}', [PasswordSetupController::class, 'create'])
+    ->middleware('throttle:10,1')
+    ->name('password.reset');
+Route::post('/senha/nova', [PasswordSetupController::class, 'store'])
+    ->middleware('throttle:6,1')
+    ->name('password.update');
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', EnsureActiveAccount::class])->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/perfil', [AuthController::class, 'profile'])->name('profile');
 });
 
 Route::middleware(['auth', 'role:REVENDEDOR'])
+    ->middleware(EnsureActiveAccount::class)
     ->as('reseller.')
     ->group(function (): void {
         Route::get('/dashboard', [ResellerDashboardController::class, 'index'])->name('dashboard');
@@ -51,7 +61,7 @@ Route::middleware(['auth', 'role:REVENDEDOR'])
     });
 
 Route::prefix('admin')
-    ->middleware(['auth', 'role:ADMIN'])
+    ->middleware(['auth', EnsureActiveAccount::class, 'role:ADMIN'])
     ->as('admin.')
     ->group(function (): void {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -63,6 +73,11 @@ Route::prefix('admin')
         Route::patch('/produtos/{product}', [AdminProductController::class, 'update'])->name('products.update');
 
         Route::get('/revendedores', [AdminResellerController::class, 'index'])->name('resellers.index');
+        Route::get('/usuarios', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/usuarios/novo', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/usuarios', [AdminUserController::class, 'store'])->name('users.store');
+        Route::patch('/usuarios/{user}/status', [AdminUserController::class, 'updateStatus'])->name('users.status.update');
+        Route::post('/usuarios/{user}/enviar-acesso', [AdminUserController::class, 'sendPasswordSetupEmail'])->name('users.password.send');
         Route::get('/pedidos', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::patch('/pedidos/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status.update');
     });
