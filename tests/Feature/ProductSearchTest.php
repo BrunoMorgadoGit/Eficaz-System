@@ -66,4 +66,41 @@ class ProductSearchTest extends TestCase
         $responseName->assertSee('EFI-1001');
         $responseName->assertDontSee('EFI-0000');
     }
+
+    public function test_search_hides_inactive_products_and_reports_empty_results(): void
+    {
+        $user = User::factory()->reseller()->create();
+        Reseller::query()->create([
+            'user_id' => $user->id,
+            'company_name' => 'Distribuidora Teste',
+            'commercial_profile' => Reseller::PROFILE_STANDARD,
+            'credit_limit' => null,
+            'is_active' => true,
+        ]);
+        Product::query()->create([
+            'sku' => 'ACTIVE-1',
+            'name' => 'Produto disponível',
+            'price' => '10.00',
+            'stock' => 1,
+            'is_active' => true,
+        ]);
+        Product::query()->create([
+            'sku' => 'INACTIVE-1',
+            'name' => 'Produto oculto',
+            'price' => '10.00',
+            'stock' => 1,
+            'is_active' => false,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('reseller.products.index'))
+            ->assertOk()
+            ->assertSee('ACTIVE-1')
+            ->assertDontSee('INACTIVE-1');
+
+        $this->get(route('reseller.products.index', ['sku' => 'inexistente']))
+            ->assertOk()
+            ->assertSee('Nenhum produto disponível foi encontrado')
+            ->assertDontSee('ACTIVE-1');
+    }
 }

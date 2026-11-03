@@ -1,7 +1,8 @@
-const passwordInput = document.querySelector('#password');
-const passwordToggle = document.querySelector('[data-password-toggle]');
+document.querySelectorAll('[data-password-toggle]').forEach((passwordToggle) => {
+    const passwordInput = document.getElementById(passwordToggle.getAttribute('aria-controls'));
 
-if (passwordInput && passwordToggle) {
+    if (!passwordInput) return;
+
     passwordToggle.addEventListener('click', () => {
         const isVisible = passwordInput.type === 'password';
 
@@ -10,4 +11,4 @@ if (passwordInput && passwordToggle) {
         passwordToggle.setAttribute('aria-pressed', String(isVisible));
         passwordInput.focus();
     });
-}
+});

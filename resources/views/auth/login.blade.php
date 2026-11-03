@@ -49,6 +49,12 @@
                         </div>
                     @endif
 
+                    @if (session('error'))
+                        <div class="login-notice login-notice--error" role="alert">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     @if ($errors->any())
                         <div class="login-notice login-notice--error" role="alert">
                             Não foi possível entrar. Confira os campos abaixo.

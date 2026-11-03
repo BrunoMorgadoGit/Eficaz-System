@@ -42,6 +42,14 @@ class AuthController extends Controller
             ]);
         }
 
+        if (! $user->is_active) {
+            $this->logoutSession($request);
+
+            throw ValidationException::withMessages([
+                'email' => 'Sua conta está inativa. Fale com um administrador.',
+            ]);
+        }
+
         if ($user->isReseller()) {
             $user->loadMissing('reseller');
 

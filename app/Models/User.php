@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\SetPasswordNotification;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -13,6 +14,10 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $attributes = [
+        'is_active' => true,
+    ];
 
     public const ROLE_ADMIN = 'ADMIN';
 
@@ -28,6 +33,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_active',
     ];
 
     /**
@@ -50,6 +56,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -66,5 +73,10 @@ class User extends Authenticatable
     public function isReseller(): bool
     {
         return $this->role === self::ROLE_REVENDEDOR;
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new SetPasswordNotification($token));
     }
 }
