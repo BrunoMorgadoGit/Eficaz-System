@@ -81,3 +81,6 @@ Route::prefix('admin')
         Route::get('/pedidos', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::patch('/pedidos/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status.update');
     });
+
+Route::get('/orcamentos', [QuoteController::class, 'index'])
+    ->name('quotes.index');
