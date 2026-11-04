@@ -324,7 +324,10 @@
                         <a href="{{ route('reseller.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>
                         <a href="{{ route('reseller.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>Produtos</a>
                         <a href="{{ route('reseller.cart.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'cart'])>Carrinho @if ($cartProductCount > 0)<span class="sidebar-cart-count">{{ $cartProductCount }}</span>@endif</a>
-                        <a href="{{ $quoteNavHref }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])>Orçamento</a>
+                        <a href="{{ route('reseller.quotes.index') }}"
+   @class(['nav-link', 'nav-link--active' => $activeNav === 'quotes'])>
+   Orçamentos
+</a>
                         <a href="{{ route('reseller.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>Meus pedidos</a>
                     @endif
                 </nav>
