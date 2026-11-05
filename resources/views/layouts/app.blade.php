@@ -287,7 +287,6 @@
                             <h1>Carrinho</h1>
                             <p>{{ $cartProductCount }} {{ $cartProductCount === 1 ? 'produto selecionado' : 'produtos selecionados' }}</p>
                         </div>
-                        <a href="{{ route('reseller.products.index') }}"><x-icon name="plus" size="1em" /> Adicionar produtos</a>
                     </div>
                 @endif
 
