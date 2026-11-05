@@ -37,17 +37,18 @@ class QuoteController extends Controller
 
         return view('reseller.quotes.show', compact('quote'));
     }
+
     public function index(Request $request): View
-{
-    $reseller = $this->currentReseller($request);
+    {
+        $reseller = $this->currentReseller($request);
 
-    $quotes = Quote::query()
-        ->where('reseller_id', $reseller->getKey())
-        ->with('order')
-        ->withCount('items')
-        ->latest()
-        ->paginate(15);
+        $quotes = Quote::query()
+            ->where('reseller_id', $reseller->getKey())
+            ->with('order')
+            ->withCount('items')
+            ->latest()
+            ->paginate(15);
 
-    return view('reseller.quotes.index', compact('quotes'));
-}
+        return view('reseller.quotes.index', compact('quotes'));
+    }
 }

@@ -1,14 +1,12 @@
 <x-layouts.app title="Orçamento | Eficaz B2B" active-nav="quotes">
     @php
         $quoteItems = data_get($quote, 'items', []);
-        $quoteId = (int) data_get($quote, 'id', 0);
         $quoteCreatedAt = data_get($quote, 'created_at');
         $quoteSubtotal = (float) data_get($quote, 'subtotal', 0);
         $quoteDiscount = (float) data_get($quote, 'discount', 0);
         $quoteTotal = (float) data_get($quote, 'total', 0);
         $convertedOrder = data_get($quote, 'order');
-        $quoteNumber = 'ORC-' . ($quoteCreatedAt ? \Illuminate\Support\Carbon::parse($quoteCreatedAt)->format('Y') : '—')
-            . '-' . str_pad((string) $quoteId, 4, '0', STR_PAD_LEFT);
+        $quoteNumber = $quote->reference();
     @endphp
 
     <div class="quote-mobile-heading lg:hidden">

@@ -42,4 +42,12 @@ class Quote extends Model
     {
         return $this->hasOne(Order::class);
     }
+
+    public function reference(): string
+    {
+        $year = $this->created_at?->format('Y') ?? '—';
+        $id = str_pad((string) $this->getKey(), 4, '0', STR_PAD_LEFT);
+
+        return "ORC-{$year}-{$id}";
+    }
 }
