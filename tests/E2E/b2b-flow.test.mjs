@@ -99,6 +99,37 @@ test('reseller completes a purchase and an administrator updates its status', as
     assert.match(await resellerPage.locator('body').innerText(), /R\$ 3\.591,00/);
 
     await Promise.all([
+        resellerPage.waitForURL((url) => url.pathname === '/orcamentos'),
+        resellerPage.locator('#app-sidebar').getByRole('link', { name: 'Orçamentos', exact: true }).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /Histórico de Orçamentos/);
+
+    await Promise.all([
+        resellerPage.waitForURL((url) => /^\/orcamentos\/\d+$/.test(url.pathname)),
+        resellerPage.getByRole('link', { name: /ORC-/ }).click(),
+    ]);
+
+    await resellerPage.setViewportSize({ width: 390, height: 844 });
+    await resellerPage.locator('#mobile-menu-btn').click();
+    await Promise.all([
+        resellerPage.waitForURL((url) => url.pathname === '/orcamentos'),
+        resellerPage.locator('#app-sidebar').getByRole('link', { name: 'Orçamentos', exact: true }).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /Histórico de Orçamentos/);
+    assert.match(await resellerPage.locator('body').innerText(), /Em aberto/);
+    assert.equal(
+        await resellerPage.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth),
+        false,
+        'The quote history should not overflow horizontally on mobile.',
+    );
+
+    await Promise.all([
+        resellerPage.waitForURL((url) => /^\/orcamentos\/\d+$/.test(url.pathname)),
+        resellerPage.getByRole('link', { name: /ORC-/ }).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /EFI-1001/);
+
+    await Promise.all([
         resellerPage.waitForURL((url) => /^\/pedidos\/\d+$/.test(url.pathname)),
         resellerPage.getByRole('button', { name: 'Converter em pedido' }).click(),
     ]);

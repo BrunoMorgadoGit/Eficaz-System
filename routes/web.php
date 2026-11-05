@@ -40,8 +40,7 @@ Route::middleware(['auth', EnsureActiveAccount::class])->group(function (): void
     Route::get('/perfil', [AuthController::class, 'profile'])->name('profile');
 });
 
-Route::middleware(['auth', 'role:REVENDEDOR'])
-    ->middleware(EnsureActiveAccount::class)
+Route::middleware(['auth', 'role:REVENDEDOR', EnsureActiveAccount::class])
     ->as('reseller.')
     ->group(function (): void {
         Route::get('/dashboard', [ResellerDashboardController::class, 'index'])->name('dashboard');
@@ -52,6 +51,7 @@ Route::middleware(['auth', 'role:REVENDEDOR'])
         Route::patch('/carrinho/itens/{item}', [CartController::class, 'update'])->name('cart.items.update');
         Route::delete('/carrinho/itens/{item}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 
+        Route::get('/orcamentos', [QuoteController::class, 'index'])->name('quotes.index');
         Route::post('/orcamentos', [QuoteController::class, 'store'])->name('quotes.store');
         Route::get('/orcamentos/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 
@@ -81,6 +81,3 @@ Route::prefix('admin')
         Route::get('/pedidos', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::patch('/pedidos/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status.update');
     });
-
-Route::get('/orcamentos', [QuoteController::class, 'index'])
-    ->name('quotes.index');
