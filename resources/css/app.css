@@ -64,7 +64,7 @@
     .field-label { @apply mb-1.5 block text-sm font-medium text-slate-700; }
     .field-control { @apply block w-full rounded-xl border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm outline-none placeholder:text-slate-400 focus:border-brand-500 focus:ring-3 focus:ring-brand-500/15; }
     .field-help { @apply mt-1.5 text-xs leading-5 text-slate-500; }
-    .data-table-wrap { @apply overflow-x-auto; }
+    .data-table-wrap { @apply relative min-w-0 max-w-full overflow-x-auto; }
     .data-table { @apply min-w-full divide-y divide-slate-100 text-left text-sm; }
     .data-table thead { @apply bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500; }
     .data-table th { @apply whitespace-nowrap px-5 py-3; }
@@ -424,7 +424,7 @@
 
     .catalog-table-panel { overflow: hidden; border: 1px solid var(--color-ink-300); border-radius: 4px; background: var(--color-white); }
     .catalog-mobile-list { display: none; }
-    .catalog-table-wrap { width: 100%; overflow-x: auto; }
+    .catalog-table-wrap { position: relative; width: 100%; overflow-x: auto; }
     .catalog-table { width: 100%; min-width: 860px; border-collapse: collapse; table-layout: fixed; text-align: left; }
     .catalog-table th { height: 51px; border-bottom: 1px solid var(--color-ink-300); padding: 0 12px; background: var(--color-ink-50); color: var(--color-ink-600); font-size: 9px; font-weight: var(--font-weight-medium); letter-spacing: .055em; text-transform: uppercase; }
     .catalog-table th:nth-child(1) { width: 10%; }

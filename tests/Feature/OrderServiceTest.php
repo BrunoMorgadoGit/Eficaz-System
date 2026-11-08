@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CommercialPolicy;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Quote;
@@ -19,7 +20,7 @@ class OrderServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_order_conversion_preserves_quote_snapshot_and_does_not_decrement_stock(): void
+    public function test_order_conversion_preserves_quote_snapshot_and_decrements_stock(): void
     {
         ['reseller' => $reseller, 'product' => $product, 'quote' => $quote] = $this->makeQuote();
         $product->update(['name' => 'Nome atual do catálogo', 'price' => '99.00']);
@@ -32,7 +33,9 @@ class OrderServiceTest extends TestCase
         $this->assertSame('Produto do orçamento', $order->items->sole()->name);
         $this->assertSame('10.00', $order->items->sole()->unit_price);
         $this->assertSame('20.00', $order->items->sole()->line_total);
-        $this->assertSame(5, $product->fresh()->stock);
+        $this->assertSame(3, $product->fresh()->stock);
+        $this->assertSame('Pagamento de teste', $order->payment_terms);
+        $this->assertSame(Reseller::PROFILE_STANDARD, $order->commercial_profile);
     }
 
     public function test_order_conversion_rejects_a_quote_owned_by_another_reseller(): void
@@ -110,6 +113,73 @@ class OrderServiceTest extends TestCase
         }
     }
 
+    public function test_duplicate_quote_lines_cannot_overconsume_one_product_stock(): void
+    {
+        ['quote' => $quote, 'product' => $product, 'reseller' => $reseller] = $this->makeQuote();
+        $product->update(['stock' => 3]);
+        QuoteItem::query()->create([
+            'quote_id' => $quote->id,
+            'product_id' => $product->id,
+            'sku' => $product->sku,
+            'name' => 'Linha duplicada',
+            'unit_price' => '10.00',
+            'quantity' => 2,
+            'line_total' => '20.00',
+        ]);
+        $quote->update(['subtotal' => '40.00', 'total' => '40.00']);
+
+        try {
+            (new OrderService(new PricingService))->createFromQuote($reseller, $quote);
+            $this->fail('Duplicate quote lines must be checked as one combined SKU quantity.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('quote', $exception->errors());
+            $this->assertSame(3, $product->fresh()->stock);
+            $this->assertSame(0, Order::query()->count());
+        }
+    }
+
+    public function test_order_conversion_rejects_a_missing_credit_limit_and_preserves_stock(): void
+    {
+        ['quote' => $quote, 'product' => $product, 'reseller' => $reseller] = $this->makeQuote();
+        $reseller->update(['credit_limit' => null]);
+
+        try {
+            (new OrderService(new PricingService))->createFromQuote($reseller, $quote);
+            $this->fail('An order cannot be issued before a credit limit is configured.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('quote', $exception->errors());
+            $this->assertSame(5, $product->fresh()->stock);
+            $this->assertSame(0, Order::query()->count());
+        }
+    }
+
+    public function test_pending_and_approved_orders_commit_credit_until_completion(): void
+    {
+        ['reseller' => $reseller, 'quote' => $firstQuote] = $this->makeQuote();
+        $reseller->update(['credit_limit' => '20.00']);
+        ['quote' => $secondQuote] = $this->makeQuote('second@example.test');
+        $secondQuote->update(['reseller_id' => $reseller->id]);
+
+        $service = new OrderService(new PricingService);
+        $firstOrder = $service->createFromQuote($reseller, $firstQuote);
+
+        try {
+            $service->createFromQuote($reseller, $secondQuote);
+            $this->fail('A pending order must consume the available credit.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('quote', $exception->errors());
+        }
+
+        $firstOrder->update(['status' => Order::STATUS_CONCLUIDO]);
+        $secondOrder = $service->createFromQuote($reseller, $secondQuote);
+
+        $this->assertSame(Order::STATUS_PENDENTE, $secondOrder->status);
+        $committedTotal = $reseller->fresh()->orders()
+            ->whereIn('status', [Order::STATUS_PENDENTE, Order::STATUS_APROVADO])
+            ->sum('total');
+        $this->assertSame(2000, (new PricingService)->toCents($committedTotal));
+    }
+
     public function test_order_conversion_rejects_inconsistent_line_and_quote_subtotals(): void
     {
         ['quote' => $lineTotalQuote, 'reseller' => $reseller] = $this->makeQuote('line@example.test');
@@ -171,6 +241,9 @@ class OrderServiceTest extends TestCase
             'subtotal' => '20.00',
             'discount' => '0.00',
             'total' => '20.00',
+            'commercial_profile' => Reseller::PROFILE_STANDARD,
+            'profile_discount_percentage' => 0,
+            'payment_terms' => 'Pagamento de teste',
         ]);
         QuoteItem::query()->create([
             'quote_id' => $quote->id,
@@ -189,13 +262,18 @@ class OrderServiceTest extends TestCase
     private function makeReseller(string $email = 'reseller@example.test'): Reseller
     {
         $user = User::factory()->reseller()->create(['email' => $email]);
-
-        return Reseller::query()->create([
+        $reseller = Reseller::query()->create([
             'user_id' => $user->id,
             'company_name' => 'Empresa de teste',
             'commercial_profile' => Reseller::PROFILE_STANDARD,
-            'credit_limit' => null,
+            'credit_limit' => '1000.00',
             'is_active' => true,
         ]);
+
+        CommercialPolicy::query()
+            ->where('commercial_profile', Reseller::PROFILE_STANDARD)
+            ->update(['payment_terms' => 'Pagamento de teste']);
+
+        return $reseller;
     }
 }

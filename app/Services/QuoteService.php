@@ -13,7 +13,14 @@ use Illuminate\Validation\ValidationException;
 
 class QuoteService
 {
-    public function __construct(private readonly PricingService $pricing) {}
+    private readonly CommercialPolicyService $commercialPolicies;
+
+    public function __construct(
+        private readonly PricingService $pricing,
+        ?CommercialPolicyService $commercialPolicies = null,
+    ) {
+        $this->commercialPolicies = $commercialPolicies ?? new CommercialPolicyService;
+    }
 
     /**
      * Creates a persisted, immutable price snapshot from the current cart.
@@ -71,12 +78,21 @@ class QuoteService
                 ];
             }
 
-            $totals = $this->pricing->calculate($quoteLines, $reseller);
+            $policy = $this->commercialPolicies->forReseller($reseller);
+            $promotion = $this->commercialPolicies->activePromotionFor($reseller, $policy->discount_percentage);
+            $totals = $this->pricing->calculate($quoteLines, $policy->discount_percentage, $promotion);
             $quote = Quote::query()->create([
                 'reseller_id' => $reseller->getKey(),
                 'subtotal' => $totals['subtotal'],
                 'discount' => $totals['discount'],
                 'total' => $totals['total'],
+                'commercial_profile' => $policy->commercial_profile,
+                'profile_discount_percentage' => $totals['profile_discount_percentage'],
+                'promotion_id' => $totals['promotion_id'],
+                'promotion_name' => $totals['promotion_name'],
+                'promotion_discount_percentage' => $totals['promotion_discount_percentage'],
+                'promotion_is_stackable' => $totals['promotion_is_stackable'],
+                'payment_terms' => $policy->payment_terms,
             ]);
 
             foreach ($quoteLines as $line) {

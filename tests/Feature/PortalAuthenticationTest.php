@@ -74,6 +74,25 @@ class PortalAuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_login_limits_attempts_per_email_and_ip(): void
+    {
+        $payload = [
+            'email' => 'locked@example.test',
+            'password' => 'incorrect-password',
+        ];
+
+        for ($attempt = 0; $attempt < 6; $attempt++) {
+            $this->post(route('login.store'), $payload)->assertSessionHasErrors('email');
+        }
+
+        $this->post(route('login.store'), [
+            ...$payload,
+            'email' => 'another@example.test',
+        ])->assertSessionHasErrors('email');
+
+        $this->post(route('login.store'), $payload)->assertStatus(429);
+    }
+
     public function test_login_rejects_resellers_without_an_active_reseller_profile(): void
     {
         $missingProfile = User::factory()->reseller()->create();

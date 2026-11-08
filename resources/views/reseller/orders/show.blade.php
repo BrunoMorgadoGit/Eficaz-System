@@ -19,7 +19,7 @@
         <a href="{{ route('reseller.orders.index') }}" class="btn btn-secondary">Voltar aos pedidos</a>
     </section>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+    <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <section class="panel">
             <div class="panel-heading">
                 <div>
@@ -64,6 +64,14 @@
             <div class="mt-5 rounded-xl bg-slate-50 p-3">
                 <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Status atual</p>
                 <div class="mt-2"><x-status-badge :status="data_get($order ?? null, 'status', 'PENDENTE')" /></div>
+            </div>
+            <div class="mt-4 rounded-xl bg-slate-50 p-3 text-sm">
+                <p class="font-medium text-slate-900">Condições registradas</p>
+                <p class="mt-2 text-slate-600">Grupo {{ $order->commercial_profile ?: 'não registrado' }} · desconto {{ $order->profile_discount_percentage ?? '—' }}%</p>
+                <p class="mt-1 text-slate-600">Pagamento: {{ $order->payment_terms ?: 'não informado' }}</p>
+                @if ($order->promotion_name)
+                    <p class="mt-1 text-slate-600">Promoção: {{ $order->promotion_name }} ({{ $order->promotion_discount_percentage }}%)</p>
+                @endif
             </div>
         </aside>
     </div>

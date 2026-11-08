@@ -13,7 +13,14 @@ use Illuminate\Validation\ValidationException;
 
 class CartService
 {
-    public function __construct(private readonly PricingService $pricing) {}
+    private readonly CommercialPolicyService $commercialPolicies;
+
+    public function __construct(
+        private readonly PricingService $pricing,
+        ?CommercialPolicyService $commercialPolicies = null,
+    ) {
+        $this->commercialPolicies = $commercialPolicies ?? new CommercialPolicyService;
+    }
 
     public function cartFor(Reseller $reseller): Cart
     {
@@ -99,7 +106,9 @@ class CartService
     {
         $cart->loadMissing('items.product');
         $items = $cart->items;
-        $totals = $this->pricing->calculate($items, $reseller);
+        $policy = $this->commercialPolicies->forReseller($reseller);
+        $promotion = $this->commercialPolicies->activePromotionFor($reseller, $policy->discount_percentage);
+        $totals = $this->pricing->calculate($items, $policy->discount_percentage, $promotion);
 
         return [
             'items' => $items,

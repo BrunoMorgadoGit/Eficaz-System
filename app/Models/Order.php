@@ -24,6 +24,13 @@ class Order extends Model
         'subtotal',
         'discount',
         'total',
+        'commercial_profile',
+        'profile_discount_percentage',
+        'promotion_id',
+        'promotion_name',
+        'promotion_discount_percentage',
+        'promotion_is_stackable',
+        'payment_terms',
     ];
 
     protected function casts(): array
@@ -32,6 +39,9 @@ class Order extends Model
             'subtotal' => 'decimal:2',
             'discount' => 'decimal:2',
             'total' => 'decimal:2',
+            'profile_discount_percentage' => 'integer',
+            'promotion_discount_percentage' => 'integer',
+            'promotion_is_stackable' => 'boolean',
         ];
     }
 
@@ -48,5 +58,10 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function promotion(): BelongsTo
+    {
+        return $this->belongsTo(Promotion::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminProductController extends Controller
 {
@@ -32,7 +33,7 @@ class AdminProductController extends Controller
     public function store(StoreProductRequest $request): RedirectResponse
     {
         $this->ensureAdmin($request);
-        Product::query()->create($request->validated());
+        DB::transaction(fn (): Product => Product::query()->create($request->validated()));
 
         return redirect()->route('admin.products.index')->with('success', 'Produto cadastrado com sucesso.');
     }
@@ -47,7 +48,10 @@ class AdminProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product): RedirectResponse
     {
         $this->ensureAdmin($request);
-        $product->update($request->validated());
+        DB::transaction(function () use ($request, $product): void {
+            $lockedProduct = Product::query()->lockForUpdate()->findOrFail($product->getKey());
+            $lockedProduct->update($request->validated());
+        }, 3);
 
         return redirect()->route('admin.products.index')->with('success', 'Produto atualizado com sucesso.');
     }

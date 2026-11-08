@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminCommercialPolicyController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\AdminProductController;
+use App\Http\Controllers\AdminPromotionController;
 use App\Http\Controllers\AdminResellerController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
@@ -27,7 +29,9 @@ Route::get('/', function (Request $request) {
 })->name('home');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('login.store');
 Route::get('/senha/nova/{token}', [PasswordSetupController::class, 'create'])
     ->middleware('throttle:10,1')
     ->name('password.reset');
@@ -66,6 +70,13 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+        Route::get('/condicoes-comerciais', [AdminCommercialPolicyController::class, 'index'])->name('commercial-policies.index');
+        Route::patch('/condicoes-comerciais/{commercialPolicy}', [AdminCommercialPolicyController::class, 'update'])->name('commercial-policies.update');
+        Route::get('/promocoes', [AdminPromotionController::class, 'index'])->name('promotions.index');
+        Route::post('/promocoes', [AdminPromotionController::class, 'store'])->name('promotions.store');
+        Route::patch('/promocoes/{promotion}', [AdminPromotionController::class, 'update'])->name('promotions.update');
+        Route::delete('/promocoes/{promotion}', [AdminPromotionController::class, 'destroy'])->name('promotions.destroy');
+
         Route::get('/produtos', [AdminProductController::class, 'index'])->name('products.index');
         Route::get('/produtos/novo', [AdminProductController::class, 'create'])->name('products.create');
         Route::post('/produtos', [AdminProductController::class, 'store'])->name('products.store');
@@ -73,6 +84,8 @@ Route::prefix('admin')
         Route::patch('/produtos/{product}', [AdminProductController::class, 'update'])->name('products.update');
 
         Route::get('/revendedores', [AdminResellerController::class, 'index'])->name('resellers.index');
+        Route::get('/revendedores/{reseller}/editar', [AdminResellerController::class, 'edit'])->name('resellers.edit');
+        Route::patch('/revendedores/{reseller}', [AdminResellerController::class, 'update'])->name('resellers.update');
         Route::get('/usuarios', [AdminUserController::class, 'index'])->name('users.index');
         Route::get('/usuarios/novo', [AdminUserController::class, 'create'])->name('users.create');
         Route::post('/usuarios', [AdminUserController::class, 'store'])->name('users.store');

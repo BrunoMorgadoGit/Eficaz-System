@@ -2,6 +2,8 @@
     @php
         $stats = $stats ?? [];
         $recentOrders = $recentOrders ?? [];
+        $skuVolumes = $skuVolumes ?? collect();
+        $activeResellers = $activeResellers ?? collect();
         $trendValues = $trendValues ?? data_get($trend ?? [], 'values', []);
         $trendValues = is_iterable($trendValues) ? collect($trendValues)->map(fn ($value) => (float) $value)->values() : collect();
         $trendLabels = collect(data_get($trend ?? [], 'labels', []))->values();
@@ -21,14 +23,14 @@
             <a href="{{ route('admin.products.create') }}" class="btn btn-brand">Cadastrar produto</a>
         </section>
 
-        <section class="admin-dashboard-metrics mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores da plataforma">
+        <section class="admin-dashboard-metrics mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores da plataforma">
             <x-stat-card label="Total de pedidos" :value="data_get($stats, 'orders', 0)" hint="Pedidos registrados na plataforma" icon="clipboard-list" />
-            <x-stat-card label="Total vendido" :value="'R$ ' . number_format((float) data_get($stats, 'revenue', 0), 2, ',', '.')" hint="Valor de todos os pedidos" icon="coin" />
+            <x-stat-card label="Vendas concluídas" :value="'R$ ' . number_format((float) data_get($stats, 'completed_revenue', 0), 2, ',', '.')" :hint="data_get($stats, 'completed_orders', 0) . ' pedidos concluídos'" icon="coin" />
             <x-stat-card label="Produtos ativos" :value="data_get($stats, 'products', 0)" hint="Itens disponíveis no catálogo" icon="package" />
             <x-stat-card label="Revendedores" :value="data_get($stats, 'resellers', 0)" hint="Empresas cadastradas" icon="users" />
         </section>
 
-        <section class="admin-dashboard-main-grid mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
+        <section class="admin-dashboard-main-grid mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
             <article class="panel admin-dashboard-chart-panel p-5 sm:p-6">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
@@ -100,6 +102,71 @@
                     <a href="{{ route('admin.resellers.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-brand-400 hover:bg-brand-50"><span>Consultar revendedores</span><span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                     <a href="{{ route('admin.orders.index') }}" class="admin-dashboard-shortcut flex items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-navy-900 transition hover:border-brand-400 hover:bg-brand-50"><span>Atualizar pedidos</span><span aria-hidden="true"><x-icon name="arrow-right" size="1em" /></span></a>
                 </div>
+            </article>
+        </section>
+
+        <section class="admin-dashboard-insights mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2" aria-label="Volume de vendas e comportamento de compra">
+            <article class="panel admin-dashboard-orders-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2 class="panel-title">Giro por SKU</h2>
+                        <p class="panel-subtitle">Giro estimado: unidades baixadas desde o início do controle ÷ estoque médio entre a base e o saldo atual. Pedidos considera os últimos seis meses.</p>
+                    </div>
+                </div>
+                @if ($skuVolumes->isNotEmpty())
+                    <div class="data-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>SKU</th><th>Produto</th><th class="text-right">Pedidos · 6 meses</th><th class="text-right">Estoque atual</th><th class="text-right">Giro estimado</th></tr></thead>
+                            <tbody>
+                                @foreach ($skuVolumes as $skuVolume)
+                                    <tr>
+                                        <td class="font-mono font-medium text-brand-700">{{ $skuVolume->sku }}</td>
+                                        <td>{{ $skuVolume->name }}</td>
+                                        <td class="font-mono text-right font-medium text-navy-950">{{ number_format((int) $skuVolume->units_ordered, 0, ',', '.') }}</td>
+                                        <td class="font-mono text-right">{{ $skuVolume->current_stock === null ? '—' : number_format((int) $skuVolume->current_stock, 0, ',', '.') }}</td>
+                                        <td class="text-right">
+                                            @if ($skuVolume->stock_turnover === null)
+                                                <span>—</span>
+                                            @else
+                                                <span class="font-mono font-medium text-navy-950">{{ number_format((float) $skuVolume->stock_turnover, 2, ',', '.') }}x</span>
+                                                <span class="mt-1 block text-xs text-slate-500">desde {{ \Illuminate\Support\Carbon::parse($skuVolume->tracked_since)->format('d/m/Y') }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <x-empty-state title="Sem movimentação de estoque" description="Os SKUs aparecerão aqui quando houver pedidos emitidos no período." />
+                @endif
+            </article>
+
+            <article class="panel admin-dashboard-orders-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2 class="panel-title">Atividade dos revendedores</h2>
+                        <p class="panel-subtitle">Compras concluídas por parceiro nos últimos seis meses.</p>
+                    </div>
+                </div>
+                @if ($activeResellers->isNotEmpty())
+                    <div class="data-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Revendedor</th><th>Pedidos</th><th class="text-right">Vendas concluídas</th></tr></thead>
+                            <tbody>
+                                @foreach ($activeResellers as $activity)
+                                    <tr>
+                                        <td>{{ $activity->reseller?->company_name ?? 'Revendedor removido' }}</td>
+                                        <td class="font-mono">{{ number_format((int) $activity->completed_orders, 0, ',', '.') }}</td>
+                                        <td class="font-mono text-right font-medium text-navy-950">R$ {{ number_format((float) $activity->completed_revenue, 2, ',', '.') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <x-empty-state title="Sem compras concluídas" description="A atividade dos revendedores aparecerá aqui conforme os pedidos forem concluídos." />
+                @endif
             </article>
         </section>
 

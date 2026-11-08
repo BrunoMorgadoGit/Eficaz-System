@@ -55,6 +55,12 @@
         } elseif ($isAdmin && request()->routeIs('admin.resellers.index')) {
             $moduleHeaderTitle = 'Revendedores';
             $moduleHeaderDescription = 'Consulte os perfis comerciais e o limite de crédito das empresas cadastradas.';
+        } elseif ($isAdmin && request()->routeIs('admin.commercial-policies.*')) {
+            $moduleHeaderTitle = 'Condições comerciais';
+            $moduleHeaderDescription = 'Configure descontos e condições de pagamento por grupo de revendedores.';
+        } elseif ($isAdmin && request()->routeIs('admin.promotions.*')) {
+            $moduleHeaderTitle = 'Promoções';
+            $moduleHeaderDescription = 'Cadastre ofertas por grupo com período de validade e aplicação transparente.';
         } elseif ($isAdmin && request()->routeIs('admin.users.index')) {
             $moduleHeaderTitle = 'Usuários';
             $moduleHeaderDescription = 'Gerencie os acessos de administradores e revendedores do portal.';
@@ -139,6 +145,18 @@
                        title="Revendedores">
                         <x-icon name="users" class="nav-icon" />
                         <span class="nav-label">Revendedores</span>
+                    </a>
+                    <a href="{{ route('admin.commercial-policies.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'commercial-policies'])
+                       title="Condições comerciais">
+                        <x-icon name="credit-card" class="nav-icon" />
+                        <span class="nav-label">Condições</span>
+                    </a>
+                    <a href="{{ route('admin.promotions.index') }}"
+                       @class(['nav-link', 'nav-link--active' => $activeNav === 'promotions'])
+                       title="Promoções">
+                        <x-icon name="coin" class="nav-icon" />
+                        <span class="nav-label">Promoções</span>
                     </a>
                     <a href="{{ route('admin.users.index') }}"
                        @class(['nav-link', 'nav-link--active' => $activeNav === 'users'])
@@ -316,6 +334,8 @@
                         <a href="{{ route('admin.dashboard') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'dashboard'])>Visão geral</a>
                         <a href="{{ route('admin.products.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'products'])>Catálogo</a>
                         <a href="{{ route('admin.resellers.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'resellers'])>Revendedores</a>
+                        <a href="{{ route('admin.commercial-policies.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'commercial-policies'])>Condições comerciais</a>
+                        <a href="{{ route('admin.promotions.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'promotions'])>Promoções</a>
                         <a href="{{ route('admin.users.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'users'])>Usuários</a>
                         <a href="{{ route('admin.orders.index') }}" @class(['nav-link', 'nav-link--active' => $activeNav === 'orders'])>Pedidos</a>
                     @else

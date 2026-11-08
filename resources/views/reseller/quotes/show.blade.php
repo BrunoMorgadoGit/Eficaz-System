@@ -98,14 +98,25 @@
                 </div>
             </dl>
 
+            <div class="mt-5 rounded-xl bg-slate-50 p-4 text-sm">
+                <p class="font-semibold text-navy-950">Condições registradas</p>
+                <p class="mt-2 text-slate-600">Grupo {{ $quote->commercial_profile ?: 'não registrado' }} · desconto do grupo {{ $quote->profile_discount_percentage ?? '—' }}%</p>
+                <p class="mt-1 text-slate-600">Pagamento: {{ $quote->payment_terms ?: 'não configurado' }}</p>
+                @if ($quote->promotion_name)
+                    <p class="mt-1 text-slate-600">Promoção: {{ $quote->promotion_name }} ({{ $quote->promotion_discount_percentage }}%)</p>
+                @endif
+            </div>
+
             @if ($convertedOrder)
                 <p class="quote-converted-note">Este orçamento já foi convertido em pedido.</p>
                 <a href="{{ route('reseller.orders.show', $convertedOrder) }}" class="quote-primary-action">Ver pedido #{{ data_get($convertedOrder, 'id') }}</a>
-            @elseif (count($quoteItems))
+            @elseif (count($quoteItems) && $quote->payment_terms)
                 <form method="POST" action="{{ route('reseller.orders.store', $quote) }}">
                     @csrf
                     <button type="submit" class="quote-primary-action">Converter em pedido</button>
                 </form>
+            @elseif (count($quoteItems))
+                <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">A emissão está bloqueada até a administração configurar a condição de pagamento do grupo. Gere um novo orçamento depois da configuração.</p>
             @endif
 
             <a href="{{ route('reseller.cart.index') }}" class="quote-back-action">Voltar ao Carrinho</a>

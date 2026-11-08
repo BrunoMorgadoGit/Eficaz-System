@@ -93,7 +93,7 @@ class AdminCatalogAndOrderTest extends TestCase
         [, $reseller] = $this->makeReseller();
         $product = $this->makeProduct('DASH-1', true);
         $this->makeProduct('DASH-2', false);
-        $this->makeOrder($reseller, 'APROVADO', $product);
+        $this->makeOrder($reseller, Order::STATUS_CONCLUIDO, $product);
 
         $dashboard = $this->actingAs($admin)
             ->get(route('admin.dashboard'))
@@ -101,14 +101,78 @@ class AdminCatalogAndOrderTest extends TestCase
         $dashboard->assertViewHas('stats', fn (array $stats): bool => $stats['products'] === 1
             && $stats['resellers'] === 1
             && $stats['orders'] === 1
-            && (float) $stats['revenue'] === 190.0
+            && $stats['completed_orders'] === 1
+            && (float) $stats['completed_revenue'] === 190.0
         );
         $dashboard->assertViewHas('trendValues', fn (array $values): bool => array_sum($values) === 1);
+        $dashboard->assertViewHas('skuVolumes', fn ($rows): bool => $rows->sole()->sku === 'DASH-1'
+            && (int) $rows->sole()->units_ordered === 2
+            && (int) $rows->sole()->current_stock === 5
+        );
+        $dashboard->assertViewHas('activeResellers', fn ($rows): bool => $rows->sole()->reseller->is($reseller)
+            && (int) $rows->sole()->completed_orders === 1
+        );
 
         $this->get(route('admin.resellers.index'))
             ->assertOk()
             ->assertSee('Revendedor de teste')
-            ->assertSee('revendedor@example.test');
+            ->assertSee('revendedor@example.test')
+            ->assertSee('Não informado')
+            ->assertDontSee('R$ 0,00');
+    }
+
+    public function test_admin_can_update_reseller_group_and_credit_limit(): void
+    {
+        $admin = User::factory()->admin()->create();
+        [, $reseller] = $this->makeReseller();
+
+        $this->actingAs($admin)
+            ->get(route('admin.resellers.edit', $reseller))
+            ->assertOk()
+            ->assertSee('Condições do revendedor');
+
+        $this->patch(route('admin.resellers.update', $reseller), [
+            'company_name' => '  Revendedor Ajustado  ',
+            'commercial_profile' => ' gold ',
+            'credit_limit' => '12500.50',
+        ])->assertRedirect(route('admin.resellers.index'));
+
+        $this->assertDatabaseHas('resellers', [
+            'id' => $reseller->id,
+            'company_name' => 'Revendedor Ajustado',
+            'commercial_profile' => Reseller::PROFILE_GOLD,
+            'credit_limit' => '12500.50',
+        ]);
+
+        $this->patch(route('admin.resellers.update', $reseller), [
+            'company_name' => 'Revendedor Ajustado',
+            'commercial_profile' => Reseller::PROFILE_GOLD,
+        ])->assertSessionHasErrors('credit_limit');
+
+        $this->patch(route('admin.resellers.update', $reseller), [
+            'company_name' => 'Revendedor Ajustado',
+            'commercial_profile' => Reseller::PROFILE_GOLD,
+            'credit_limit' => '-1.00',
+        ])->assertSessionHasErrors('credit_limit');
+
+        $this->assertSame('12500.50', $reseller->fresh()->credit_limit);
+    }
+
+    public function test_admin_cannot_reduce_credit_below_open_order_commitments(): void
+    {
+        $admin = User::factory()->admin()->create();
+        [, $reseller] = $this->makeReseller('credito@example.test');
+        $this->makeOrder($reseller, Order::STATUS_PENDENTE);
+
+        $this->actingAs($admin)
+            ->patch(route('admin.resellers.update', $reseller), [
+                'company_name' => $reseller->company_name,
+                'commercial_profile' => $reseller->commercial_profile,
+                'credit_limit' => '100.00',
+            ])
+            ->assertSessionHasErrors('credit_limit');
+
+        $this->assertNull($reseller->fresh()->credit_limit);
     }
 
     public function test_admin_can_update_order_status_and_invalid_values_are_rejected(): void
@@ -129,6 +193,10 @@ class AdminCatalogAndOrderTest extends TestCase
         $this->patch(route('admin.orders.status.update', $order), ['status' => 'CANCELADO'])
             ->assertSessionHasErrors('status');
         $this->assertSame(Order::STATUS_APROVADO, $order->fresh()->status);
+
+        $this->patch(route('admin.orders.status.update', $order), ['status' => Order::STATUS_PENDENTE])
+            ->assertSessionHasErrors('status');
+        $this->assertSame(Order::STATUS_APROVADO, $order->fresh()->status);
     }
 
     public function test_resellers_cannot_access_administration_catalog_or_orders(): void
@@ -140,6 +208,12 @@ class AdminCatalogAndOrderTest extends TestCase
             ->get(route('admin.products.index'))
             ->assertForbidden();
         $this->get(route('admin.orders.index'))->assertForbidden();
+        $this->get(route('admin.resellers.edit', $reseller))->assertForbidden();
+        $this->patch(route('admin.resellers.update', $reseller), [
+            'company_name' => 'Alteração não autorizada',
+            'commercial_profile' => Reseller::PROFILE_PREMIUM,
+            'credit_limit' => '50000.00',
+        ])->assertForbidden();
         $this->patch(route('admin.orders.status.update', $order), ['status' => 'APROVADO'])
             ->assertForbidden();
     }
@@ -201,7 +275,8 @@ class AdminCatalogAndOrderTest extends TestCase
             && $stats['quotes_count'] === 2
             && $stats['open_quotes_count'] === 1
             && $stats['orders_count'] === 1
-            && (float) $stats['total_spent'] === 190.0
+            && (float) $stats['total_orders'] === 190.0
+            && (float) $stats['committed_credit'] === 190.0
         );
         $this->assertSame($reseller->id, $ownOrder->reseller_id);
     }

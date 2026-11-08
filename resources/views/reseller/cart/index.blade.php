@@ -10,6 +10,10 @@
         $cartDiscount = (float) data_get($cartSummary, 'discount', 0);
         $cartTotal = (float) data_get($cartSummary, 'total', $cartSubtotal - $cartDiscount);
         $discountRate = (int) data_get($cartSummary, 'discount_rate', 0);
+        $profileDiscountRate = (int) data_get($cartSummary, 'profile_discount_percentage', $discountRate);
+        $promotionName = data_get($cartSummary, 'promotion_name');
+        $promotionRate = data_get($cartSummary, 'promotion_discount_percentage');
+        $promotionIsStackable = data_get($cartSummary, 'promotion_is_stackable', false);
         $productCount = count($cartItems);
     @endphp
 
@@ -86,8 +90,13 @@
                         </div>
                         @if ($cartDiscount > 0)
                             <div class="cart-summary-discount">
-                                <dt>Desconto do perfil ({{ $discountRate }}%)</dt>
+                                <dt>Desconto aplicado ({{ $discountRate }}%)</dt>
                                 <dd>-R$ {{ number_format($cartDiscount, 2, ',', '.') }}</dd>
+                            </div>
+                        @endif
+                        @if ($promotionName)
+                            <div class="text-xs text-slate-500">
+                                <dt>{{ $promotionName }} · {{ $promotionRate }}% {{ $promotionIsStackable ? '(acumulado)' : '(promocional)' }}</dt>
                             </div>
                         @endif
                         <div class="cart-summary-total">
@@ -99,7 +108,7 @@
                         @csrf
                         <button type="submit" class="cart-quote-button">Gerar Orçamento</button>
                     </form>
-                    <p class="cart-summary-note">O orçamento será enviado para aprovação.</p>
+                    <p class="cart-summary-note">A condição de pagamento e os descontos serão registrados no orçamento. O estoque será baixado ao emitir o pedido.</p>
                 </aside>
             </div>
         @else

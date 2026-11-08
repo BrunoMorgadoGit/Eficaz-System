@@ -155,6 +155,97 @@ test('reseller completes a purchase and an administrator updates its status', as
 
     await resellerPage.goto(`${baseUrl}${orderPath}`);
     assert.match(await resellerPage.locator('body').innerText(), /Aprovado/);
+    assert.match(await resellerPage.locator('body').innerText(), /Condição de demonstração/);
+
+    await adminPage.goto(`${baseUrl}/admin/condicoes-comerciais`);
+    const goldPolicyForm = adminPage.locator('form').filter({ hasText: 'Grupo Gold' });
+    await goldPolicyForm.locator('input[name="payment_terms"]').fill('Condição MVP: 30 dias');
+    await goldPolicyForm.getByRole('button', { name: 'Salvar grupo' }).click();
+    assert.equal(await goldPolicyForm.locator('input[name="payment_terms"]').inputValue(), 'Condição MVP: 30 dias');
+
+    const localToday = new Date();
+    const startDateValue = new Date(localToday.setDate(localToday.getDate() - 1));
+    const startDate = new Date(startDateValue.getTime() - startDateValue.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+    const endDateValue = new Date(localToday.setDate(localToday.getDate() + 8));
+    const endDate = new Date(endDateValue.getTime() - endDateValue.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+
+    await adminPage.goto(`${baseUrl}/admin/promocoes`);
+    await adminPage.locator('#new_name').fill('Promoção teste E2E');
+    await adminPage.locator('#new_profile').selectOption('GOLD');
+    await adminPage.locator('#new_discount').fill('20');
+    await adminPage.locator('#new_starts_on').fill(startDate);
+    await adminPage.locator('#new_ends_on').fill(endDate);
+    await adminPage.locator('input[type="checkbox"][name="is_active"]').check();
+    await adminPage.getByRole('button', { name: 'Cadastrar promoção' }).click();
+    assert.equal(
+        await adminPage.locator('input[name="name"]').last().inputValue(),
+        'Promoção teste E2E',
+    );
+
+    await adminPage.setViewportSize({ width: 390, height: 844 });
+    for (const adminPath of ['/admin/condicoes-comerciais', '/admin/promocoes']) {
+        await adminPage.goto(`${baseUrl}${adminPath}`);
+        assert.equal(
+            await adminPage.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth),
+            false,
+            `${adminPath} should not overflow horizontally on mobile.`,
+        );
+    }
+
+    await resellerPage.setViewportSize({ width: 1365, height: 900 });
+    await resellerPage.goto(`${baseUrl}/produtos`);
+    await resellerPage.locator('#catalog-search').fill('EFI-1002');
+    await Promise.all([
+        resellerPage.waitForURL((url) => url.searchParams.get('sku') === 'EFI-1002'),
+        resellerPage.locator('#catalog-search').press('Enter'),
+    ]);
+    const promoAddForm = resellerPage.locator('form.catalog-add-form').first();
+    await promoAddForm.locator('input[name="quantity"]').fill('1');
+    await Promise.all([
+        resellerPage.waitForURL((url) => url.pathname === '/carrinho'),
+        resellerPage.locator(`button[form="${await promoAddForm.getAttribute('id')}"]`).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /R\$ 388,40/);
+
+    await Promise.all([
+        resellerPage.waitForURL((url) => /^\/orcamentos\/\d+$/.test(url.pathname)),
+        resellerPage.getByRole('button', { name: 'Gerar Orçamento' }).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /Promoção teste E2E/);
+    assert.match(await resellerPage.locator('body').innerText(), /Condição MVP: 30 dias/);
+    const promoQuotePath = new URL(resellerPage.url()).pathname;
+    await Promise.all([
+        resellerPage.waitForURL((url) => /^\/pedidos\/\d+$/.test(url.pathname)),
+        resellerPage.getByRole('button', { name: 'Converter em pedido' }).click(),
+    ]);
+    assert.match(await resellerPage.locator('body').innerText(), /estoque foi baixado/i);
+    await resellerPage.goto(`${baseUrl}/dashboard`);
+    assert.match(await resellerPage.locator('body').innerText(), /R\$ 21\.020,60/);
+
+    await adminPage.goto(`${baseUrl}/admin/dashboard`);
+    assert.match(await adminPage.locator('body').innerText(), /Giro por SKU/);
+    assert.match(await adminPage.locator('body').innerText(), /Giro estimado/);
+    assert.match(await adminPage.locator('body').innerText(), /0,09x/);
+    assert.match(await adminPage.locator('body').innerText(), /0,02x/);
+
+    await assertResponsivePages(resellerPage, [
+        '/dashboard',
+        '/produtos?sku=EFI-1002',
+        '/carrinho',
+        '/orcamentos',
+        promoQuotePath,
+        '/pedidos',
+        orderPath,
+    ], 'revendedor');
+    await assertResponsivePages(adminPage, [
+        '/admin/dashboard',
+        '/admin/produtos',
+        '/admin/revendedores',
+        '/admin/pedidos',
+        '/admin/usuarios',
+        '/admin/condicoes-comerciais',
+        '/admin/promocoes',
+    ], 'admin');
 });
 
 test('invalid login stays on the login page and reseller access to admin is denied', async () => {
@@ -190,6 +281,68 @@ async function createContext() {
     contexts.push(context);
 
     return context;
+}
+
+async function assertResponsivePages(page, paths, role) {
+    for (const width of [390, 768, 1365]) {
+        await page.setViewportSize({ width, height: 900 });
+
+        for (const pagePath of paths) {
+            const response = await page.goto(`${baseUrl}${pagePath}`);
+            const overflow = await page.evaluate(() => {
+                const viewportWidth = document.documentElement.clientWidth;
+                const layout = ['html', 'body', '.page-shell', '.app-main', '.content-wrap', '.content-wrap > div']
+                    .map((selector) => {
+                        const element = document.querySelector(selector);
+
+                        if (!element) return { selector, missing: true };
+
+                        const bounds = element.getBoundingClientRect();
+                        const style = getComputedStyle(element);
+
+                        return {
+                            selector,
+                            left: Math.round(bounds.left),
+                            right: Math.round(bounds.right),
+                            width: Math.round(bounds.width),
+                            scrollWidth: element.scrollWidth,
+                            clientWidth: element.clientWidth,
+                            minWidth: style.minWidth,
+                            display: style.display,
+                            gridTemplateColumns: style.gridTemplateColumns,
+                        };
+                    });
+
+                const elements = Array.from(document.querySelectorAll('body *'))
+                    .map((element) => {
+                        const bounds = element.getBoundingClientRect();
+
+                        return {
+                            tag: element.tagName.toLowerCase(),
+                            id: element.id,
+                            className: typeof element.className === 'string' ? element.className : '',
+                            left: Math.round(bounds.left),
+                            right: Math.round(bounds.right),
+                            width: Math.round(bounds.width),
+                            scrollWidth: element.scrollWidth,
+                            clientWidth: element.clientWidth,
+                        };
+                    })
+                    .filter((element) => element.right > viewportWidth + 1)
+                    .sort((left, right) => left.right - right.right)
+                    .slice(0, 8);
+
+                return { layout, elements };
+            });
+
+            assert.equal(response?.status(), 200, `${role} page ${pagePath} should load at ${width}px.`);
+            assert.equal(
+                await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth),
+                false,
+                `${role} page ${pagePath} should not overflow horizontally at ${width}px: ${JSON.stringify(overflow)}`,
+            );
+        }
+    }
 }
 
 function createTestEnvironment(directory, appUrl) {

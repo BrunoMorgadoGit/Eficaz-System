@@ -2,31 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\Reseller;
+use App\Models\Promotion;
 use InvalidArgumentException;
 
 class PricingService
 {
     /**
-     * The commercial rule intentionally stays small for the MVP: the reseller
-     * profile determines one discount for the entire quotation.
-     */
-    public function discountRateFor(Reseller $reseller): int
-    {
-        return match (strtoupper(trim((string) $reseller->commercial_profile))) {
-            'STANDARD' => 0,
-            'GOLD' => 5,
-            'PREMIUM' => 10,
-            default => throw new InvalidArgumentException('Perfil comercial inválido para cálculo de preço.'),
-        };
-    }
-
-    /**
      * @param  iterable<array<string, mixed>|object>  $items
-     * @return array{subtotal: string, discount: string, total: string, discount_rate: int}
+     * @return array{subtotal: string, discount: string, total: string, discount_rate: int, profile_discount_percentage: int, promotion_discount_percentage: ?int, promotion_name: ?string, promotion_id: ?int, promotion_is_stackable: ?bool}
      */
-    public function calculate(iterable $items, Reseller $reseller): array
-    {
+    public function calculate(
+        iterable $items,
+        int $profileDiscountPercentage,
+        ?Promotion $promotion = null,
+    ): array {
         $subtotalCents = 0;
 
         foreach ($items as $item) {
@@ -38,7 +27,19 @@ class PricingService
             }
         }
 
-        $discountRate = $this->discountRateFor($reseller);
+        if ($profileDiscountPercentage < 0 || $profileDiscountPercentage > 100) {
+            throw new InvalidArgumentException('O desconto comercial deve estar entre 0% e 100%.');
+        }
+
+        $profileDiscountRate = $profileDiscountPercentage;
+        $promotionRate = $promotion?->discount_percentage ?? 0;
+        $promotionApplied = $promotion !== null && (
+            ($promotion->is_stackable && $profileDiscountRate < 100)
+            || (! $promotion->is_stackable && $promotionRate > $profileDiscountRate)
+        );
+        $discountRate = $promotionApplied
+            ? ($promotion->is_stackable ? min(100, $profileDiscountRate + $promotionRate) : max($profileDiscountRate, $promotionRate))
+            : $profileDiscountRate;
         $discountCents = intdiv(($subtotalCents * $discountRate) + 50, 100);
 
         return [
@@ -46,6 +47,11 @@ class PricingService
             'discount' => $this->fromCents($discountCents),
             'total' => $this->fromCents($subtotalCents - $discountCents),
             'discount_rate' => $discountRate,
+            'profile_discount_percentage' => $profileDiscountRate,
+            'promotion_discount_percentage' => $promotionApplied ? $promotionRate : null,
+            'promotion_name' => $promotionApplied ? $promotion->name : null,
+            'promotion_id' => $promotionApplied ? $promotion->getKey() : null,
+            'promotion_is_stackable' => $promotionApplied ? $promotion->is_stackable : null,
         ];
     }
 

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\CommercialPolicy;
 use App\Models\Product;
 use App\Models\Reseller;
 use App\Models\User;
@@ -144,6 +145,8 @@ class CartQuoteServiceTest extends TestCase
         $this->assertSame('18.00', $quote->subtotal);
         $this->assertSame('0.90', $quote->discount);
         $this->assertSame('17.10', $quote->total);
+        $this->assertSame('Pagamento de teste', $quote->payment_terms);
+        $this->assertSame(5, $quote->profile_discount_percentage);
         $this->assertSame('9.00', $quote->items->sole()->unit_price);
         $this->assertSame('18.00', $quote->items->sole()->line_total);
         $this->assertSame(1, CartItem::query()->count());
@@ -206,13 +209,19 @@ class CartQuoteServiceTest extends TestCase
     {
         $user = User::factory()->reseller()->create(['email' => $email]);
 
-        return Reseller::query()->create([
+        $reseller = Reseller::query()->create([
             'user_id' => $user->id,
             'company_name' => 'Empresa de teste',
             'commercial_profile' => $profile,
             'credit_limit' => null,
             'is_active' => true,
         ]);
+
+        CommercialPolicy::query()
+            ->where('commercial_profile', $profile)
+            ->update(['payment_terms' => 'Pagamento de teste']);
+
+        return $reseller;
     }
 
     private function makeProduct(

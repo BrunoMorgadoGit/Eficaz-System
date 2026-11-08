@@ -2,7 +2,6 @@
 
 namespace Tests\Unit;
 
-use App\Models\Reseller;
 use App\Services\PricingService;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -18,44 +17,40 @@ class PricingServiceTest extends TestCase
             (object) ['unit_price' => '25.50', 'quantity' => 1],
         ];
 
-        $standard = new Reseller(['commercial_profile' => Reseller::PROFILE_STANDARD]);
-        $gold = new Reseller(['commercial_profile' => Reseller::PROFILE_GOLD]);
-        $premium = new Reseller(['commercial_profile' => Reseller::PROFILE_PREMIUM]);
-
         $this->assertSame([
             'subtotal' => '225.50',
             'discount' => '0.00',
             'total' => '225.50',
             'discount_rate' => 0,
-        ], $pricing->calculate($items, $standard));
+            'profile_discount_percentage' => 0,
+            'promotion_discount_percentage' => null,
+            'promotion_name' => null,
+            'promotion_id' => null,
+            'promotion_is_stackable' => null,
+        ], $pricing->calculate($items, 0));
 
-        $this->assertSame('11.28', $pricing->calculate($items, $gold)['discount']);
-        $this->assertSame('214.22', $pricing->calculate($items, $gold)['total']);
-        $this->assertSame('22.55', $pricing->calculate($items, $premium)['discount']);
-        $this->assertSame('202.95', $pricing->calculate($items, $premium)['total']);
-    }
-
-    public function test_it_normalizes_the_commercial_profile_before_calculating_the_discount(): void
-    {
-        $pricing = new PricingService;
-        $reseller = new Reseller(['commercial_profile' => ' gold ']);
-
-        $this->assertSame(5, $pricing->discountRateFor($reseller));
+        $this->assertSame('11.28', $pricing->calculate($items, 5)['discount']);
+        $this->assertSame('214.22', $pricing->calculate($items, 5)['total']);
+        $this->assertSame('22.55', $pricing->calculate($items, 10)['discount']);
+        $this->assertSame('202.95', $pricing->calculate($items, 10)['total']);
     }
 
     public function test_it_rounds_discount_to_the_nearest_cent(): void
     {
         $pricing = new PricingService;
-        $reseller = new Reseller(['commercial_profile' => Reseller::PROFILE_GOLD]);
-
         $this->assertSame([
             'subtotal' => '10.10',
             'discount' => '0.51',
             'total' => '9.59',
             'discount_rate' => 5,
+            'profile_discount_percentage' => 5,
+            'promotion_discount_percentage' => null,
+            'promotion_name' => null,
+            'promotion_id' => null,
+            'promotion_is_stackable' => null,
         ], $pricing->calculate([
             ['unit_price' => '10.10', 'quantity' => 1],
-        ], $reseller));
+        ], 5));
     }
 
     public function test_it_calculates_line_totals_and_sums_them_in_cents(): void
@@ -114,13 +109,6 @@ class PricingServiceTest extends TestCase
         ];
     }
 
-    public function test_it_rejects_an_unknown_commercial_profile(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new PricingService)->discountRateFor(new Reseller(['commercial_profile' => 'SILVER']));
-    }
-
     #[DataProvider('nonPositiveQuantities')]
     public function test_it_rejects_non_positive_quantities_in_calculations(int $quantity): void
     {
@@ -128,7 +116,7 @@ class PricingServiceTest extends TestCase
 
         (new PricingService)->calculate(
             [['unit_price' => '10.00', 'quantity' => $quantity]],
-            new Reseller(['commercial_profile' => Reseller::PROFILE_STANDARD]),
+            0,
         );
     }
 

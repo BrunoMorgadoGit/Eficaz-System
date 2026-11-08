@@ -15,20 +15,33 @@ use Illuminate\Validation\ValidationException;
 
 class OrderService
 {
-    public function __construct(private readonly PricingService $pricing) {}
+    private readonly StockMovementService $stockMovements;
+
+    public function __construct(
+        private readonly PricingService $pricing,
+        ?StockMovementService $stockMovements = null,
+    ) {
+        $this->stockMovements = $stockMovements ?? new StockMovementService;
+    }
 
     /**
      * Converts exactly one owned quotation into one order.
      *
-     * Stock is validated under a database lock, but deliberately is not
-     * decremented: inventory integration is outside this academic MVP.
+     * Stock and reseller credit are checked and updated under row locks so
+     * two simultaneous order conversions cannot oversell or overcommit credit.
      */
-    public function createFromQuote(Reseller $reseller, Quote $quote): Order
+    public function createFromQuote(Reseller $reseller, Quote $quote, ?int $performedBy = null): Order
     {
-        return DB::transaction(function () use ($reseller, $quote): Order {
+        return DB::transaction(function () use ($reseller, $quote, $performedBy): Order {
+            $lockedReseller = Reseller::query()->lockForUpdate()->findOrFail($reseller->getKey());
+
+            if (! $lockedReseller->is_active) {
+                $this->invalidQuote('A conta de revendedor está inativa e não pode emitir pedidos.');
+            }
+
             $lockedQuote = Quote::query()->lockForUpdate()->findOrFail($quote->getKey());
 
-            if ((int) $lockedQuote->reseller_id !== (int) $reseller->getKey()) {
+            if ((int) $lockedQuote->reseller_id !== (int) $lockedReseller->getKey()) {
                 throw new AuthorizationException('Este orçamento não pertence ao seu perfil de revendedor.');
             }
 
@@ -49,23 +62,36 @@ class OrderService
                 $this->invalidQuote('O orçamento contém um produto inválido e não pode ser convertido.');
             }
 
+            if (! is_string($lockedQuote->payment_terms) || trim($lockedQuote->payment_terms) === '') {
+                $this->invalidQuote('A condição de pagamento deste orçamento não está configurada. Peça à administração para configurar o grupo comercial e gere um novo orçamento.');
+            }
+
             $products = Product::query()
                 ->whereIn('id', $quoteItems->pluck('product_id')->all())
+                ->orderBy('id')
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('id');
 
-            foreach ($quoteItems as $quoteItem) {
-                $product = $products->get($quoteItem->product_id);
+            $requestedByProduct = $quoteItems
+                ->groupBy(fn (QuoteItem $item): int => (int) $item->product_id)
+                ->map(fn ($items): int => (int) $items->sum('quantity'));
+
+            foreach ($requestedByProduct as $productId => $quantity) {
+                $product = $products->get($productId);
 
                 if (! $product || ! $product->is_active) {
-                    $this->invalidQuote("O SKU {$quoteItem->sku} não está disponível para pedido.");
+                    $quoteItem = $quoteItems->firstWhere('product_id', $productId);
+                    $this->invalidQuote("O SKU {$quoteItem?->sku} não está disponível para pedido.");
                 }
 
-                if ((int) $quoteItem->quantity < 1 || (int) $quoteItem->quantity > (int) $product->stock) {
-                    $this->invalidQuote("O estoque disponível para o SKU {$quoteItem->sku} não atende este orçamento.");
+                if ($quantity < 1 || $quantity > (int) $product->stock) {
+                    $quoteItem = $quoteItems->firstWhere('product_id', $productId);
+                    $this->invalidQuote("O estoque disponível para o SKU {$quoteItem?->sku} não atende este orçamento.");
                 }
+            }
 
+            foreach ($quoteItems as $quoteItem) {
                 if (! $this->pricing->amountsMatch(
                     $quoteItem->line_total,
                     $this->pricing->lineTotal($quoteItem->unit_price, (int) $quoteItem->quantity),
@@ -76,13 +102,39 @@ class OrderService
 
             $this->assertFrozenTotalsAreConsistent($lockedQuote, $quoteItems);
 
+            if ($lockedReseller->credit_limit === null) {
+                $this->invalidQuote('O limite de crédito ainda não foi definido para sua empresa. Solicite a configuração à administração.');
+            }
+
+            $committedCents = $this->pricing->toCents(Order::query()
+                ->where('reseller_id', $lockedReseller->getKey())
+                ->whereIn('status', [Order::STATUS_PENDENTE, Order::STATUS_APROVADO])
+                ->sum('total'));
+            $orderTotalCents = $this->pricing->toCents($lockedQuote->total);
+            $creditLimitCents = $this->pricing->toCents($lockedReseller->credit_limit);
+
+            if ($committedCents + $orderTotalCents > $creditLimitCents) {
+                $availableCents = max(0, $creditLimitCents - $committedCents);
+                $this->invalidQuote(sprintf(
+                    'O pedido excede seu crédito disponível de R$ %s.',
+                    number_format($availableCents / 100, 2, ',', '.'),
+                ));
+            }
+
             $order = Order::query()->create([
-                'reseller_id' => $reseller->getKey(),
+                'reseller_id' => $lockedReseller->getKey(),
                 'quote_id' => $lockedQuote->getKey(),
-                'status' => 'PENDENTE',
+                'status' => Order::STATUS_PENDENTE,
                 'subtotal' => $lockedQuote->subtotal,
                 'discount' => $lockedQuote->discount,
                 'total' => $lockedQuote->total,
+                'commercial_profile' => $lockedQuote->commercial_profile,
+                'profile_discount_percentage' => $lockedQuote->profile_discount_percentage,
+                'promotion_id' => $lockedQuote->promotion_id,
+                'promotion_name' => $lockedQuote->promotion_name,
+                'promotion_discount_percentage' => $lockedQuote->promotion_discount_percentage,
+                'promotion_is_stackable' => $lockedQuote->promotion_is_stackable,
+                'payment_terms' => $lockedQuote->payment_terms,
             ]);
 
             foreach ($quoteItems as $quoteItem) {
@@ -96,6 +148,21 @@ class OrderService
                     'quantity' => $quoteItem->quantity,
                     'line_total' => $quoteItem->line_total,
                 ]);
+            }
+
+            foreach ($requestedByProduct as $productId => $quantity) {
+                $product = $products->get($productId);
+                $stockBefore = (int) $product->stock;
+                $stockAfter = $stockBefore - $quantity;
+                $product->updateQuietly(['stock' => $stockAfter]);
+                $this->stockMovements->recordOrderIssue(
+                    $product,
+                    $quantity,
+                    $stockBefore,
+                    $stockAfter,
+                    $order,
+                    $performedBy,
+                );
             }
 
             return $order->load(['items', 'quote', 'reseller']);

@@ -72,10 +72,14 @@ class OrderController extends Controller
 
     public function store(Request $request, Quote $quote): RedirectResponse
     {
-        $order = $this->orders->createFromQuote($this->currentReseller($request), $quote);
+        $order = $this->orders->createFromQuote(
+            $this->currentReseller($request),
+            $quote,
+            (int) $request->user()->getAuthIdentifier(),
+        );
 
         return redirect()
             ->route('reseller.orders.show', $order)
-            ->with('success', 'Pedido criado com sucesso. O estoque não foi baixado nesta demonstração do MVP.');
+            ->with('success', 'Pedido criado. O estoque foi baixado e o valor ficou comprometido no seu limite de crédito.');
     }
 }

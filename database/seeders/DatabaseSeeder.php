@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CommercialPolicy;
 use App\Models\Product;
 use App\Models\Reseller;
 use App\Models\User;
@@ -12,6 +13,16 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! in_array((string) config('app.env'), ['local', 'testing'], true)) {
+            $this->command?->warn('Dados de demonstração ignorados fora de local/testing.');
+
+            return;
+        }
+
+        CommercialPolicy::query()
+            ->whereNull('payment_terms')
+            ->update(['payment_terms' => 'Condição de demonstração — revisar antes de uso real']);
+
         User::updateOrCreate([
             'email' => 'admin@eficaz.test',
         ], [

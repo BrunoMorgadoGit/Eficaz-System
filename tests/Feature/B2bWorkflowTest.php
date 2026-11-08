@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\CartItem;
+use App\Models\CommercialPolicy;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Quote;
@@ -77,7 +78,7 @@ class B2bWorkflowTest extends TestCase
             ->assertSessionHasErrors('quote');
 
         $this->assertSame(1, Order::query()->where('quote_id', $quote->id)->count());
-        $this->assertSame(10, $product->fresh()->stock);
+        $this->assertSame(8, $product->fresh()->stock);
     }
 
     public function test_a_reseller_cannot_add_a_product_without_stock(): void
@@ -127,6 +128,10 @@ class B2bWorkflowTest extends TestCase
             'credit_limit' => '10000.00',
             'is_active' => true,
         ]);
+
+        CommercialPolicy::query()
+            ->where('commercial_profile', $profile)
+            ->update(['payment_terms' => 'Pagamento de teste']);
 
         return [$user, $reseller];
     }

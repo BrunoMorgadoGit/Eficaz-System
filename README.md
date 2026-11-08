@@ -8,10 +8,10 @@ Monólito acadêmico em **PHP 8.2 + Laravel 12 + Blade + Tailwind + MySQL**. O f
 
 ```text
 Revendedor: login → busca por SKU → carrinho → orçamento → pedido → status
-Administrador: login → dashboard → produtos / revendedores / pedidos
+Administrador: login → dashboard → produtos / revendedores / condições comerciais / promoções / pedidos
 ```
 
-O escopo vem do guia BMAD fornecido: não há ERP real, nota fiscal, pagamento, frete, promoções avançadas, microserviços, filas, Redis ou IA.
+O fluxo segue os slides de requisitos: busca por SKU, orçamento e pedido autônomos, regras comerciais por grupo e painel de vendas/estoque/parceiros. Não há ERP, emissão fiscal, pagamento, frete ou integrações externas.
 
 ---
 
@@ -35,7 +35,7 @@ routes/web.php          rotas do portal
 
 ## Modelo de dados
 
-`users` possui o papel `ADMIN` ou `REVENDEDOR`. Cada revendedor possui um perfil comercial (`STANDARD`, `GOLD`, `PREMIUM`), um carrinho, orçamentos e pedidos. Produtos têm SKU único, preço, estoque e situação ativa. Itens de orçamento e pedido guardam snapshots de SKU, nome e valores para preservar o histórico.
+`users` possui o papel `ADMIN` ou `REVENDEDOR`. Cada revendedor possui um perfil comercial (`STANDARD`, `GOLD`, `PREMIUM`), um limite de crédito, um carrinho, orçamentos e pedidos. Administradores configuram desconto e condição de pagamento por grupo e promoções percentuais com datas. Produtos têm SKU único, preço, estoque e situação ativa. Orçamentos e pedidos guardam snapshots das regras comerciais, produtos e valores para preservar o histórico.
 
 O banco garante que `orders.quote_id` seja único: um orçamento só pode gerar um pedido.
 
@@ -43,7 +43,7 @@ O banco garante que `orders.quote_id` seja único: um orçamento só pode gerar 
 
 ## Decisões explícitas do esqueleto
 
-O guia não define baixa/reserva de estoque, validade/cancelamento de orçamento, frete, impostos ou regra de crédito. Portanto, este MVP **valida o estoque** ao incluir itens e converter o pedido, mas **não baixa nem reserva estoque**. Ao gerar orçamento, o carrinho é limpo e os itens/valores ficam congelados no orçamento. Essas são decisões técnicas documentadas, não requisitos adicionais do guia.
+O estoque é validado no carrinho e no orçamento; ele é baixado ao emitir o pedido, sob transação e bloqueio de linha. Pedidos pendentes e aprovados comprometem o limite de crédito; pedidos concluídos liberam o crédito. Sem limite ou condição de pagamento, o pedido não pode ser emitido. Promoções podem ou não acumular com o desconto do grupo, conforme a opção administrativa; entre promoções simultâneas, vale a de maior desconto efetivo. Valores comerciais não são presumidos: condições de pagamento ficam vazias em uma instalação nova e não há promoções ativas por padrão. O seeder local usa texto marcado como condição demonstrativa. Não existe cancelamento/devolução nem reposição automática de estoque no escopo atual.
 
 ---
 
@@ -219,7 +219,23 @@ O `docker-compose.yml` pré-configurado expõe o MySQL 8.4 na porta **3308** (`1
 | Administrador | `admin@eficaz.test` | `password` |
 | Revendedor  | `revendedor@eficaz.test` | `password` |
 
-> ⚠️ Essas contas são exclusivas para ambiente de demonstração. Não use essas credenciais em produção.
+> Essas contas e os produtos de exemplo são criados somente em `local` e `testing`. O seeder ignora os dados de demonstração nos demais ambientes.
+
+### Primeiro administrador em uma instalação real
+
+Depois de configurar banco, chave da aplicação e executar as migrations, crie a primeira conta administrativa com:
+
+```bash
+php artisan app:bootstrap-admin
+```
+
+O comando solicita nome, e-mail e senha sem gravar credenciais fixas no código, e recusa uma nova inicialização quando já existe um administrador ativo. Não execute `migrate:fresh` em uma base com dados reais.
+
+Depois do primeiro acesso, configure as condições de pagamento em **Condições comerciais** e cadastre um limite de crédito por revendedor. Uma condição de pagamento vazia ou um limite ausente bloqueiam a emissão de pedidos. Promoções são opcionais e começam sem nenhuma oferta ativa. Os percentuais de perfil já existentes no projeto (`STANDARD` 0%, `GOLD` 5%, `PREMIUM` 10%) são carregados pela migration e podem ser alterados pela administração.
+
+Em `local` e `testing`, o seeder preenche condições com um texto explicitamente demonstrativo para permitir a apresentação do fluxo. Esse texto não corresponde a prazo de pagamento real. Em produção o seeder é ignorado e as condições precisam ser definidas com a equipe comercial antes de liberar pedidos.
+
+Em produção, configure `APP_ENV=production`, `APP_DEBUG=false`, uma chave `APP_KEY` própria, banco de dados e transporte de e-mail reais. O cookie de sessão é `Secure` por padrão nesse ambiente; publique o portal exclusivamente por HTTPS.
 
 ---
 

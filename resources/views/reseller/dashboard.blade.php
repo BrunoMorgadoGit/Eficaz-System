@@ -6,7 +6,9 @@
         $monthDelta = (int) data_get($summary, 'orders_this_month', 0)
             - (int) data_get($summary, 'orders_previous_month', 0);
         $creditLimit = data_get($reseller, 'credit_limit');
-        $totalInOrders = (float) data_get($summary, 'total_spent', 0);
+        $totalInOrders = (float) data_get($summary, 'total_orders', 0);
+        $committedCredit = data_get($summary, 'committed_credit');
+        $availableCredit = data_get($summary, 'available_credit');
     @endphp
 
     <div class="reseller-dashboard">
@@ -59,11 +61,11 @@
 
             <article class="dashboard-stat-card">
                 <div>
-                    <p class="dashboard-stat-label">Limite cadastrado</p>
+                    <p class="dashboard-stat-label">Crédito disponível</p>
                     <p class="dashboard-stat-value dashboard-stat-value--money">
-                        {{ $creditLimit === null ? 'Não informado' : 'R$ ' . number_format((float) $creditLimit, 2, ',', '.') }}
+                        {{ $availableCredit === null ? 'Não configurado' : 'R$ ' . number_format((float) $availableCredit, 2, ',', '.') }}
                     </p>
-                    <p class="dashboard-stat-hint">Valor do seu perfil comercial</p>
+                    <p class="dashboard-stat-hint">Limite menos pedidos pendentes e aprovados</p>
                 </div>
                 <span class="dashboard-stat-icon dashboard-stat-icon--gold" aria-hidden="true">
                     <x-icon name="credit-card" />
@@ -73,15 +75,20 @@
 
         <section class="dashboard-credit-panel" aria-labelledby="dashboard-credit-title">
             <div>
-                <p id="dashboard-credit-title" class="dashboard-credit-label">Limite de crédito cadastrado</p>
+                <p id="dashboard-credit-title" class="dashboard-credit-label">Condições do grupo {{ ucfirst(strtolower($commercialPolicy->commercial_profile)) }}</p>
                 <p class="dashboard-credit-value">
-                    {{ $creditLimit === null ? 'Não informado' : 'R$ ' . number_format((float) $creditLimit, 2, ',', '.') }}
+                    {{ $commercialPolicy->payment_terms ?: 'Condição de pagamento não configurada' }}
                 </p>
-                <p class="dashboard-credit-note">O limite exibido é o valor registrado para {{ data_get($reseller, 'company_name', 'sua empresa') }}.</p>
+                <p class="dashboard-credit-note">Desconto do grupo: {{ $commercialPolicy->discount_percentage }}%.
+                    @if ($activePromotion)
+                        Promoção atual: {{ $activePromotion->name }} ({{ $activePromotion->discount_percentage }}%).
+                    @endif
+                </p>
             </div>
             <div class="dashboard-credit-total">
-                <span>Total em pedidos registrados</span>
-                <strong>R$ {{ number_format($totalInOrders, 2, ',', '.') }}</strong>
+                <span>Crédito comprometido · total em pedidos</span>
+                <strong>{{ $creditLimit === null ? 'Limite não definido' : 'R$ ' . number_format((float) $committedCredit, 2, ',', '.') . ' comprometidos' }}</strong>
+                <span class="mt-2 block text-xs text-slate-500">Limite: {{ $creditLimit === null ? 'não informado' : 'R$ ' . number_format((float) $creditLimit, 2, ',', '.') }} · Pedidos registrados: R$ {{ number_format($totalInOrders, 2, ',', '.') }}</span>
             </div>
         </section>
 

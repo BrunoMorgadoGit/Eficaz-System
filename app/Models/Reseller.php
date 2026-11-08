@@ -53,13 +53,4 @@ class Reseller extends Model
     {
         return $this->hasMany(Order::class);
     }
-
-    public function discountPercentage(): int
-    {
-        return match ($this->commercial_profile) {
-            self::PROFILE_GOLD => 5,
-            self::PROFILE_PREMIUM => 10,
-            default => 0,
-        };
-    }
 }
